@@ -11,15 +11,38 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.FinaceManager">
+
+        <!-- Splash Screen (LAUNCHER) -->
         <activity
-            android:name=".activity.MainActivity"
-            android:exported="true">
+            android:name=".activity.SplashActivity"
+            android:exported="true"
+            android:theme="@style/Theme.FinaceManager.Splash">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!-- PIN Lock -->
+        <activity
+            android:name=".activity.PinLockActivity"
+            android:exported="false" />
+
+        <!-- Main (Bottom Navigation Host) -->
+        <activity
+            android:name=".activity.MainActivity"
+            android:exported="false" />
+
+        <!-- Add Transaction -->
+        <activity
+            android:name=".activity.AddTransactionActivity"
+            android:exported="false" />
+
+        <!-- Pot Detail -->
+        <activity
+            android:name=".activity.PotDetailActivity"
+            android:exported="false" />
+
     </application>
 
 </manifest>

@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="@dimen/spacing_lg">
+
+        <TextView
+            android:id="@+id/tv_dialog_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/title_add_pot"
+            android:textColor="@color/color_text_primary"
+            android:textSize="@dimen/text_title"
+            android:textStyle="bold" />
+
+        <!-- Preview: Hiển thị icon + color đã chọn -->
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_md"
+            android:gravity="center">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <FrameLayout
+                    android:layout_width="64dp"
+                    android:layout_height="64dp">
+
+                    <View
+                        android:id="@+id/view_preview_bg"
+                        android:layout_width="64dp"
+                        android:layout_height="64dp" />
+
+                    <TextView
+                        android:id="@+id/tv_preview_icon"
+                        android:layout_width="64dp"
+                        android:layout_height="64dp"
+                        android:gravity="center"
+                        android:text="💰"
+                        android:textSize="30sp" />
+                </FrameLayout>
+
+                <TextView
+                    android:id="@+id/tv_preview_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:textColor="@color/color_text_hint"
+                    android:textSize="11sp"
+                    android:text="Xem trước" />
+            </LinearLayout>
+        </FrameLayout>
+
+        <!-- Tên hủ -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/til_pot_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_md"
+            app:boxCornerRadiusBottomEnd="@dimen/button_radius"
+            app:boxCornerRadiusBottomStart="@dimen/button_radius"
+            app:boxCornerRadiusTopEnd="@dimen/button_radius"
+            app:boxCornerRadiusTopStart="@dimen/button_radius">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/et_pot_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/hint_pot_name"
+                android:inputType="text"
+                android:maxLines="1" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Ngân sách -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/til_budget_limit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_sm"
+            app:boxCornerRadiusBottomEnd="@dimen/button_radius"
+            app:boxCornerRadiusBottomStart="@dimen/button_radius"
+            app:boxCornerRadiusTopEnd="@dimen/button_radius"
+            app:boxCornerRadiusTopStart="@dimen/button_radius"
+            app:suffixText="₫">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/et_budget_limit"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/hint_budget_limit"
+                android:inputType="numberDecimal"
+                android:maxLines="1" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Icon Picker -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_md"
+            android:text="@string/label_choose_icon"
+            android:textColor="@color/color_text_secondary"
+            android:textSize="@dimen/text_body" />
+
+        <GridLayout
+            android:id="@+id/gl_icon_picker"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_sm"
+            android:columnCount="8"
+            android:useDefaultMargins="true" />
+
+        <!-- Color Picker -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_md"
+            android:text="@string/label_choose_color"
+            android:textColor="@color/color_text_secondary"
+            android:textSize="@dimen/text_body" />
+
+        <LinearLayout
+            android:id="@+id/ll_color_picker"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_sm"
+            android:gravity="center"
+            android:orientation="horizontal" />
+
+        <!-- Buttons -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_lg"
+            android:gravity="end"
+            android:orientation="horizontal">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_cancel"
+                style="@style/Widget.Material3.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/btn_cancel" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_save"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/spacing_sm"
+                android:text="@string/btn_save" />
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>

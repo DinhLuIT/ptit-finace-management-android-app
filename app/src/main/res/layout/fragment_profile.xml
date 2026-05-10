@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/color_background">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="@dimen/spacing_md">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/title_profile"
+            android:textColor="@color/color_text_primary"
+            android:textSize="@dimen/text_title"
+            android:textStyle="bold" />
+
+        <!-- Menu Items -->
+        <com.google.android.material.card.MaterialCardView
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_md"
+            app:cardCornerRadius="@dimen/card_radius"
+            app:cardElevation="2dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/tv_statistics"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/item_min_height"
+                    android:gravity="center_vertical"
+                    android:paddingHorizontal="@dimen/spacing_md"
+                    android:text="@string/label_statistics"
+                    android:textColor="@color/color_text_primary"
+                    android:textSize="@dimen/text_subtitle"
+                    android:background="?attr/selectableItemBackground" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/color_divider" />
+
+                <TextView
+                    android:id="@+id/tv_exchange_rate"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/item_min_height"
+                    android:gravity="center_vertical"
+                    android:paddingHorizontal="@dimen/spacing_md"
+                    android:text="@string/label_exchange_rate"
+                    android:textColor="@color/color_text_primary"
+                    android:textSize="@dimen/text_subtitle"
+                    android:background="?attr/selectableItemBackground" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/color_divider" />
+
+                <TextView
+                    android:id="@+id/tv_export"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/item_min_height"
+                    android:gravity="center_vertical"
+                    android:paddingHorizontal="@dimen/spacing_md"
+                    android:text="@string/label_export"
+                    android:textColor="@color/color_text_primary"
+                    android:textSize="@dimen/text_subtitle"
+                    android:background="?attr/selectableItemBackground" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Settings Card -->
+        <com.google.android.material.card.MaterialCardView
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_md"
+            app:cardCornerRadius="@dimen/card_radius"
+            app:cardElevation="2dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/item_min_height"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingHorizontal="@dimen/spacing_md">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/label_dark_mode"
+                        android:textColor="@color/color_text_primary"
+                        android:textSize="@dimen/text_subtitle" />
+
+                    <com.google.android.material.switchmaterial.SwitchMaterial
+                        android:id="@+id/switch_dark_mode"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/color_divider" />
+
+                <TextView
+                    android:id="@+id/tv_change_pin"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/item_min_height"
+                    android:gravity="center_vertical"
+                    android:paddingHorizontal="@dimen/spacing_md"
+                    android:text="@string/label_change_pin"
+                    android:textColor="@color/color_text_primary"
+                    android:textSize="@dimen/text_subtitle"
+                    android:background="?attr/selectableItemBackground" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/color_divider" />
+
+                <TextView
+                    android:id="@+id/tv_about"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/item_min_height"
+                    android:gravity="center_vertical"
+                    android:paddingHorizontal="@dimen/spacing_md"
+                    android:text="@string/label_about"
+                    android:textColor="@color/color_text_primary"
+                    android:textSize="@dimen/text_subtitle"
+                    android:background="?attr/selectableItemBackground" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+    </LinearLayout>
+</ScrollView>

@@ -1,9 +1,40 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
     <style name="Base.Theme.FinaceManager" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+        <item name="colorPrimary">@color/color_primary</item>
+        <item name="colorPrimaryDark">@color/color_primary_dark</item>
+        <item name="colorAccent">@color/color_accent</item>
+        <item name="colorOnPrimary">@color/color_text_on_primary</item>
+        <item name="android:colorBackground">@color/color_background</item>
+        <item name="colorSurface">@color/color_surface</item>
+        <item name="android:statusBarColor">@color/color_primary</item>
+        <item name="android:navigationBarColor">@color/color_surface</item>
     </style>
 
     <style name="Theme.FinaceManager" parent="Base.Theme.FinaceManager" />
+
+    <!-- Splash Theme -->
+    <style name="Theme.FinaceManager.Splash" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="android:windowBackground">@color/color_splash_bg</item>
+        <item name="android:statusBarColor">@color/color_splash_bg</item>
+        <item name="android:navigationBarColor">@color/color_splash_bg</item>
+    </style>
+
+    <!-- Card Style -->
+    <style name="Widget.FinaceManager.Card" parent="Widget.Material3.CardView.Elevated">
+        <item name="cardCornerRadius">@dimen/card_radius</item>
+        <item name="cardElevation">@dimen/card_elevation</item>
+        <item name="contentPadding">@dimen/card_padding</item>
+    </style>
+
+    <!-- Button Styles -->
+    <style name="Widget.FinaceManager.Button" parent="Widget.Material3.Button">
+        <item name="cornerRadius">@dimen/button_radius</item>
+        <item name="android:minHeight">@dimen/button_height</item>
+    </style>
+
+    <style name="Widget.FinaceManager.Button.Outlined" parent="Widget.Material3.Button.OutlinedButton">
+        <item name="cornerRadius">@dimen/button_radius</item>
+        <item name="android:minHeight">@dimen/button_height</item>
+    </style>
 </resources>

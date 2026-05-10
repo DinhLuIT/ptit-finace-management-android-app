@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    android:background="@color/color_background">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <!-- Toolbar -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:padding="@dimen/spacing_md">
+
+            <ImageView
+                android:id="@+id/iv_back"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/btn_cancel"
+                android:padding="@dimen/spacing_sm"
+                android:src="@drawable/ic_back" />
+
+            <TextView
+                android:id="@+id/tv_pot_name"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/spacing_sm"
+                android:layout_weight="1"
+                android:textColor="@color/color_text_primary"
+                android:textSize="@dimen/text_title"
+                android:textStyle="bold" />
+
+            <ImageView
+                android:id="@+id/iv_edit"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/title_edit_pot"
+                android:padding="@dimen/spacing_sm"
+                android:src="@drawable/ic_edit" />
+
+            <ImageView
+                android:id="@+id/iv_delete"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/btn_delete"
+                android:padding="@dimen/spacing_sm"
+                android:src="@drawable/ic_delete" />
+        </LinearLayout>
+
+        <!-- Balance Card -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/spacing_md"
+            app:cardCornerRadius="@dimen/card_radius"
+            app:cardElevation="@dimen/card_elevation"
+            app:cardBackgroundColor="@color/color_primary">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="@dimen/spacing_lg">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/label_balance"
+                    android:textColor="#B3FFFFFF"
+                    android:textSize="@dimen/text_body" />
+
+                <TextView
+                    android:id="@+id/tv_balance"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/text_balance"
+                    android:textStyle="bold" />
+
+                <ProgressBar
+                    android:id="@+id/pb_budget"
+                    style="?android:attr/progressBarStyleHorizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/progress_height"
+                    android:layout_marginTop="@dimen/spacing_sm"
+                    android:max="100"
+                    android:progressDrawable="@drawable/bg_progress_bar" />
+
+                <TextView
+                    android:id="@+id/tv_budget_info"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/spacing_xs"
+                    android:textColor="#B3FFFFFF"
+                    android:textSize="@dimen/text_caption" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Transactions Header -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/spacing_md"
+            android:text="@string/label_pot_transactions"
+            android:textColor="@color/color_text_primary"
+            android:textSize="@dimen/text_subtitle"
+            android:textStyle="bold" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_transactions"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:clipToPadding="false" />
+
+        <TextView
+            android:id="@+id/tv_empty"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="@string/label_no_transactions"
+            android:textColor="@color/color_text_hint"
+            android:textSize="@dimen/text_body"
+            android:visibility="gone" />
+    </LinearLayout>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab_add_transaction"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="@dimen/fab_margin"
+        android:contentDescription="@string/title_add_transaction"
+        android:src="@drawable/ic_add"
+        app:backgroundTint="@color/color_primary"
+        app:tint="@color/white" />
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

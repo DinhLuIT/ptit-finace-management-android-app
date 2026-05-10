@@ -1,5 +1,55 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Brand Colors (Timo-inspired) -->
+    <color name="color_primary">#00B14F</color>
+    <color name="color_primary_dark">#009640</color>
+    <color name="color_primary_light">#4CD787</color>
+    <color name="color_accent">#FF6B35</color>
+
+    <!-- Background & Surface -->
+    <color name="color_background">#F5F7FA</color>
+    <color name="color_surface">#FFFFFF</color>
+    <color name="color_surface_variant">#F0F2F5</color>
+    <color name="color_card">#FFFFFF</color>
+
+    <!-- Text -->
+    <color name="color_text_primary">#212121</color>
+    <color name="color_text_secondary">#757575</color>
+    <color name="color_text_hint">#BDBDBD</color>
+    <color name="color_text_on_primary">#FFFFFF</color>
+
+    <!-- Transaction Colors -->
+    <color name="color_income">#4CAF50</color>
+    <color name="color_expense">#F44336</color>
+
+    <!-- Status Colors -->
+    <color name="color_warning">#FFC107</color>
+    <color name="color_error">#D32F2F</color>
+    <color name="color_success">#388E3C</color>
+    <color name="color_info">#1976D2</color>
+
+    <!-- Budget Status -->
+    <color name="color_budget_safe">#4CAF50</color>
+    <color name="color_budget_warning">#FFC107</color>
+    <color name="color_budget_danger">#F44336</color>
+
+    <!-- Pot Default Colors -->
+    <color name="color_pot_green">#4CAF50</color>
+    <color name="color_pot_blue">#2196F3</color>
+    <color name="color_pot_orange">#FF9800</color>
+    <color name="color_pot_purple">#9C27B0</color>
+    <color name="color_pot_red">#F44336</color>
+    <color name="color_pot_teal">#009688</color>
+    <color name="color_pot_pink">#E91E63</color>
+    <color name="color_pot_indigo">#3F51B5</color>
+
+    <!-- Misc -->
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="color_divider">#E0E0E0</color>
+    <color name="color_ripple">#1A00B14F</color>
+    <color name="color_overlay">#80000000</color>
+    <color name="color_splash_bg">#00B14F</color>
+    <color name="color_pin_dot">#00B14F</color>
+    <color name="color_pin_dot_empty">#E0E0E0</color>
 </resources>

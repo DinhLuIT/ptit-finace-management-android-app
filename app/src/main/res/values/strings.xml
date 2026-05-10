@@ -1,3 +1,125 @@
 <resources>
-    <string name="app_name">Finace Manager</string>
+    <string name="app_name">Quản Lý Chi Tiêu</string>
+
+    <!-- Bottom Navigation -->
+    <string name="nav_home">Trang chủ</string>
+    <string name="nav_pots">Hủ</string>
+    <string name="nav_transactions">Giao dịch</string>
+    <string name="nav_profile">Hồ sơ</string>
+
+    <!-- Splash -->
+    <string name="label_splash_tagline">Quản lý tài chính thông minh</string>
+
+    <!-- PIN Lock -->
+    <string name="title_create_pin">Tạo mã PIN</string>
+    <string name="title_confirm_pin">Xác nhận mã PIN</string>
+    <string name="title_enter_pin">Nhập mã PIN</string>
+    <string name="msg_create_pin">Tạo mã PIN 4 chữ số để bảo vệ ứng dụng</string>
+    <string name="msg_confirm_pin">Nhập lại mã PIN để xác nhận</string>
+    <string name="msg_enter_pin">Nhập mã PIN để mở khóa</string>
+    <string name="error_pin_mismatch">Mã PIN không khớp. Vui lòng thử lại.</string>
+    <string name="error_pin_wrong">Mã PIN không đúng. Vui lòng thử lại.</string>
+    <string name="msg_pin_created">Đã tạo mã PIN thành công!</string>
+
+    <!-- Home -->
+    <string name="label_total_balance">Tổng số dư</string>
+    <string name="label_income_this_month">Thu nhập tháng này</string>
+    <string name="label_expense_this_month">Chi tiêu tháng này</string>
+    <string name="label_recent_transactions">Giao dịch gần đây</string>
+    <string name="label_no_transactions">Chưa có giao dịch nào</string>
+    <string name="label_view_all">Xem tất cả</string>
+
+    <!-- Pots -->
+    <string name="title_pots">Hủ Chi Tiêu</string>
+    <string name="label_no_pots">Chưa có hủ nào. Nhấn + để tạo!</string>
+    <string name="label_budget">Ngân sách</string>
+    <string name="label_remaining">Còn lại</string>
+    <string name="label_balance">Số dư</string>
+
+    <!-- Add Pot -->
+    <string name="title_add_pot">Tạo Hủ Mới</string>
+    <string name="title_edit_pot">Sửa Hủ</string>
+    <string name="hint_pot_name">Tên hủ</string>
+    <string name="hint_budget_limit">Hạn mức ngân sách</string>
+    <string name="label_choose_color">Chọn màu sắc</string>
+    <string name="label_choose_icon">Chọn biểu tượng</string>
+    <string name="btn_save">Lưu</string>
+    <string name="btn_cancel">Hủy</string>
+    <string name="btn_delete">Xóa</string>
+    <string name="error_pot_name_empty">Vui lòng nhập tên hủ</string>
+    <string name="error_budget_invalid">Vui lòng nhập số tiền ngân sách hợp lệ</string>
+    <string name="msg_pot_created">Đã tạo hủ!</string>
+    <string name="msg_pot_updated">Đã cập nhật hủ!</string>
+    <string name="msg_pot_deleted">Đã xóa hủ!</string>
+
+    <!-- Pot Detail -->
+    <string name="title_pot_detail">Chi Tiết Hủ</string>
+    <string name="label_spent">Đã chi</string>
+    <string name="label_of_budget">trên ngân sách %s</string>
+    <string name="label_pot_transactions">Giao dịch</string>
+
+    <!-- Add Transaction -->
+    <string name="title_add_transaction">Giao Dịch Mới</string>
+    <string name="title_edit_transaction">Sửa Giao Dịch</string>
+    <string name="label_income">Thu nhập</string>
+    <string name="label_expense">Chi tiêu</string>
+    <string name="hint_amount">Số tiền</string>
+    <string name="hint_note">Ghi chú (tùy chọn)</string>
+    <string name="label_select_pot">Chọn hủ</string>
+    <string name="label_select_category">Chọn danh mục</string>
+    <string name="label_select_date">Chọn ngày</string>
+    <string name="error_amount_invalid">Vui lòng nhập số tiền hợp lệ</string>
+    <string name="error_pot_not_selected">Vui lòng chọn hủ</string>
+    <string name="error_category_not_selected">Vui lòng chọn danh mục</string>
+    <string name="msg_transaction_saved">Đã lưu giao dịch!</string>
+    <string name="msg_transaction_deleted">Đã xóa giao dịch!</string>
+
+    <!-- Transactions List -->
+    <string name="title_transactions">Tất Cả Giao Dịch</string>
+    <string name="hint_search">Tìm theo ghi chú…</string>
+    <string name="label_filter">Lọc</string>
+    <string name="label_all">Tất cả</string>
+
+    <!-- Profile -->
+    <string name="title_profile">Hồ Sơ</string>
+    <string name="label_statistics">Thống kê</string>
+    <string name="label_exchange_rate">Tỷ giá</string>
+    <string name="label_export">Xuất báo cáo</string>
+    <string name="label_settings">Cài đặt</string>
+    <string name="label_dark_mode">Chế độ tối</string>
+    <string name="label_notification">Thông báo</string>
+    <string name="label_change_pin">Đổi mã PIN</string>
+    <string name="label_language">Ngôn ngữ</string>
+    <string name="label_about">Giới thiệu</string>
+    <string name="label_version">Phiên bản %s</string>
+
+    <!-- Categories -->
+    <string name="cat_food">Ăn uống</string>
+    <string name="cat_housing">Nhà ở</string>
+    <string name="cat_transport">Di chuyển</string>
+    <string name="cat_entertainment">Giải trí</string>
+    <string name="cat_education">Học tập</string>
+    <string name="cat_health">Sức khỏe</string>
+    <string name="cat_shopping">Mua sắm</string>
+    <string name="cat_savings">Tiết kiệm</string>
+    <string name="cat_salary">Lương</string>
+    <string name="cat_gift">Quà tặng</string>
+    <string name="cat_other">Khác</string>
+
+    <!-- Dialogs -->
+    <string name="msg_confirm_delete">Bạn có chắc chắn muốn xóa không?</string>
+    <string name="msg_confirm_delete_pot">Bạn có chắc chắn muốn xóa hủ này? Tất cả giao dịch trong hủ sẽ bị xóa.</string>
+
+    <!-- Formats -->
+    <string name="format_currency">%s ₫</string>
+    <string name="format_percentage">%d%%</string>
+    <string name="format_positive">+%s</string>
+    <string name="format_negative">-%s</string>
+
+    <!-- General -->
+    <string name="label_today">Hôm nay</string>
+    <string name="label_yesterday">Hôm qua</string>
+    <string name="label_this_week">Tuần này</string>
+    <string name="label_this_month">Tháng này</string>
+    <string name="label_empty_state">Chưa có gì ở đây</string>
 </resources>
