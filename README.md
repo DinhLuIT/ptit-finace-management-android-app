@@ -476,20 +476,20 @@ CREATE TABLE RECURRING_TRANSACTIONS (
 ## Tiến Độ Phát Triển
 
 ### Phase 1: Core Foundation 🔴
-- [ ] SplashActivity + animation
-- [ ] PinLockActivity (tạo/xác thực PIN, SharedPreferences)
-- [ ] MainActivity + Bottom Navigation (4 tabs)
-- [ ] HomeFragment – Dashboard tổng quan
-- [ ] PotsFragment + PotAdapter – Danh sách hủ
-- [ ] AddPotActivity/Dialog – Tạo hủ mới
-- [ ] PotDetailActivity – Chi tiết hủ
-- [ ] AddTransactionActivity – Thêm giao dịch
-- [ ] TransactionAdapter – Hiển thị giao dịch
-- [ ] DBManager mở rộng – CRUD đầy đủ
-- [ ] UI/UX: layouts, colors, strings (I18N)
+- [x] SplashActivity + animation
+- [x] PinLockActivity (tạo/xác thực PIN, SharedPreferences)
+- [x] MainActivity + Bottom Navigation (4 tabs)
+- [x] HomeFragment – Dashboard tổng quan
+- [x] PotsFragment + PotAdapter – Danh sách hủ
+- [x] AddPotActivity/Dialog – Tạo hủ mới
+- [x] PotDetailActivity – Chi tiết hủ
+- [x] AddTransactionActivity – Thêm giao dịch
+- [x] TransactionAdapter – Hiển thị giao dịch
+- [x] DBManager mở rộng – CRUD đầy đủ
+- [x] UI/UX: layouts, colors, strings (I18N)
 
 ### Phase 2: Enhanced Features 🟡
-- [ ] Model Category + bảng CATEGORIES + seed data
+- [x] Model Category + bảng CATEGORIES + seed data
 - [ ] TransactionsFragment – Lịch sử, filter, search
 - [ ] StatisticsActivity – Biểu đồ (MPAndroidChart)
 - [ ] Cảnh báo ngân sách (Notification)
