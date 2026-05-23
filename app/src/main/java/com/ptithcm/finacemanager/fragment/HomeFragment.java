@@ -1,5 +1,6 @@
 package com.ptithcm.finacemanager.fragment;
 
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -27,13 +28,13 @@ import java.util.List;
 
 public class HomeFragment extends Fragment {
 
-    private TextView tvTotalBalance, tvMonthlyIncome, tvMonthlyExpense;
-    private TextView tvEmptyTransactions, tvViewAll;
-    private RecyclerView rvRecentTransactions;
-    private FloatingActionButton fabAddTransaction;
+    private TextView textViewTotalBalance, textViewMonthlyIncome, textViewMonthlyExpense;
+    private TextView textViewEmptyTransactions, textViewViewAll;
+    private RecyclerView recyclerViewRecentTransactions;
+    private FloatingActionButton floatingActionButtonAddTransaction;
 
-    private DBManager dbManager;
-    private TransactionAdapter adapter;
+    private DBManager databaseManager;
+    private TransactionAdapter transactionAdapter;
     private List<Transaction> recentTransactions = new ArrayList<>();
 
     @Nullable
@@ -46,7 +47,7 @@ public class HomeFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        dbManager = DBManager.getInstance(requireContext());
+        databaseManager = DBManager.getInstance(requireContext());
         initViews(view);
         initListeners();
         setupRecyclerView();
@@ -59,64 +60,95 @@ public class HomeFragment extends Fragment {
     }
 
     private void initViews(View view) {
-        tvTotalBalance = view.findViewById(R.id.tv_total_balance);
-        tvMonthlyIncome = view.findViewById(R.id.tv_monthly_income);
-        tvMonthlyExpense = view.findViewById(R.id.tv_monthly_expense);
-        tvEmptyTransactions = view.findViewById(R.id.tv_empty_transactions);
-        tvViewAll = view.findViewById(R.id.tv_view_all);
-        rvRecentTransactions = view.findViewById(R.id.rv_recent_transactions);
-        fabAddTransaction = view.findViewById(R.id.fab_add_transaction);
+        textViewTotalBalance = view.findViewById(R.id.tv_total_balance);
+        textViewMonthlyIncome = view.findViewById(R.id.tv_monthly_income);
+        textViewMonthlyExpense = view.findViewById(R.id.tv_monthly_expense);
+        textViewEmptyTransactions = view.findViewById(R.id.tv_empty_transactions);
+        textViewViewAll = view.findViewById(R.id.tv_view_all);
+        recyclerViewRecentTransactions = view.findViewById(R.id.rv_recent_transactions);
+        floatingActionButtonAddTransaction = view.findViewById(R.id.fab_add_transaction);
     }
 
     private void initListeners() {
-        fabAddTransaction.setOnClickListener(v -> {
+        floatingActionButtonAddTransaction.setOnClickListener(buttonView -> {
             startActivity(new Intent(requireContext(), AddTransactionActivity.class));
         });
 
-        tvViewAll.setOnClickListener(v -> {
+        textViewViewAll.setOnClickListener(buttonView -> {
             // Chuyển sang tab Transactions
             if (getActivity() != null) {
-                com.google.android.material.bottomnavigation.BottomNavigationView bnv =
+                com.google.android.material.bottomnavigation.BottomNavigationView bottomNavigationView =
                         getActivity().findViewById(R.id.bnv_main);
-                if (bnv != null) {
-                    bnv.setSelectedItemId(R.id.nav_transactions);
+                if (bottomNavigationView != null) {
+                    bottomNavigationView.setSelectedItemId(R.id.nav_transactions);
                 }
             }
         });
     }
 
     private void setupRecyclerView() {
-        adapter = new TransactionAdapter(recentTransactions, requireContext());
-        rvRecentTransactions.setLayoutManager(new LinearLayoutManager(requireContext()));
-        rvRecentTransactions.setAdapter(adapter);
+        transactionAdapter = new TransactionAdapter(recentTransactions, requireContext());
+        transactionAdapter.setOnTransactionClickListener(this::showTransactionOptionsDialog);
+        recyclerViewRecentTransactions.setLayoutManager(new LinearLayoutManager(requireContext()));
+        recyclerViewRecentTransactions.setAdapter(transactionAdapter);
+    }
+
+    private void showTransactionOptionsDialog(Transaction transaction) {
+        String[] options = {getString(R.string.title_edit_transaction), getString(R.string.btn_delete)};
+        new AlertDialog.Builder(requireContext())
+                .setTitle(R.string.title_transaction_options)
+                .setItems(options, (dialog, which) -> {
+                    if (which == 0) {
+                        // Sửa giao dịch
+                        Intent intent = new Intent(requireContext(), AddTransactionActivity.class);
+                        intent.putExtra(com.ptithcm.finacemanager.utils.Constants.EXTRA_TRANSACTION_ID, transaction.getId());
+                        startActivity(intent);
+                    } else if (which == 1) {
+                        // Xóa giao dịch
+                        confirmDeleteTransaction(transaction);
+                    }
+                })
+                .show();
+    }
+
+    private void confirmDeleteTransaction(Transaction transaction) {
+        new AlertDialog.Builder(requireContext())
+                .setTitle(R.string.btn_delete)
+                .setMessage(R.string.msg_confirm_delete)
+                .setPositiveButton(R.string.btn_delete, (dialog, which) -> {
+                    databaseManager.deleteTransaction(transaction.getId());
+                    loadData();
+                })
+                .setNegativeButton(R.string.btn_cancel, null)
+                .show();
     }
 
     private void loadData() {
         // Tổng số dư
-        double totalBalance = dbManager.getTotalBalance();
-        tvTotalBalance.setText(CurrencyFormatter.format(totalBalance));
+        double totalBalance = databaseManager.getTotalBalance();
+        textViewTotalBalance.setText(CurrencyFormatter.format(totalBalance));
 
         // Thu/Chi tháng này
         int month = DateUtils.getCurrentMonth();
         int year = DateUtils.getCurrentYear();
 
-        double income = dbManager.getTotalIncomeByMonth(month, year);
-        double expense = dbManager.getTotalExpenseByMonth(month, year);
+        double income = databaseManager.getTotalIncomeByMonth(month, year);
+        double expense = databaseManager.getTotalExpenseByMonth(month, year);
 
-        tvMonthlyIncome.setText(CurrencyFormatter.formatWithSign(income, true));
-        tvMonthlyExpense.setText(CurrencyFormatter.formatWithSign(expense, false));
+        textViewMonthlyIncome.setText(CurrencyFormatter.formatWithSign(income, true));
+        textViewMonthlyExpense.setText(CurrencyFormatter.formatWithSign(expense, false));
 
         // 5 giao dịch gần đây
-        recentTransactions = dbManager.getRecentTransactions(5);
-        adapter.updateData(recentTransactions);
+        recentTransactions = databaseManager.getRecentTransactions(5);
+        transactionAdapter.updateData(recentTransactions);
 
         // Hiển thị empty state
         if (recentTransactions.isEmpty()) {
-            tvEmptyTransactions.setVisibility(View.VISIBLE);
-            rvRecentTransactions.setVisibility(View.GONE);
+            textViewEmptyTransactions.setVisibility(View.VISIBLE);
+            recyclerViewRecentTransactions.setVisibility(View.GONE);
         } else {
-            tvEmptyTransactions.setVisibility(View.GONE);
-            rvRecentTransactions.setVisibility(View.VISIBLE);
+            textViewEmptyTransactions.setVisibility(View.GONE);
+            recyclerViewRecentTransactions.setVisibility(View.VISIBLE);
         }
     }
 }

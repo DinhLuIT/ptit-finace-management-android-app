@@ -26,13 +26,13 @@ import java.util.List;
 
 public class PotDetailActivity extends AppCompatActivity {
 
-    private TextView tvPotName, tvBalance, tvBudgetInfo, tvEmpty;
-    private ProgressBar pbBudget;
-    private RecyclerView rvTransactions;
-    private FloatingActionButton fabAddTransaction;
+    private TextView textViewPotName, textViewBalance, textViewBudgetInfo, textViewEmpty;
+    private ProgressBar progressBarBudget;
+    private RecyclerView recyclerViewTransactions;
+    private FloatingActionButton floatingActionButtonAddTransaction;
 
-    private DBManager dbManager;
-    private TransactionAdapter adapter;
+    private DBManager databaseManager;
+    private TransactionAdapter transactionAdapter;
     private List<Transaction> transactions = new ArrayList<>();
     private int potId;
 
@@ -41,7 +41,7 @@ public class PotDetailActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pot_detail);
 
-        dbManager = DBManager.getInstance(this);
+        databaseManager = DBManager.getInstance(this);
         potId = getIntent().getIntExtra(Constants.EXTRA_POT_ID, -1);
 
         if (potId == -1) {
@@ -61,71 +61,102 @@ public class PotDetailActivity extends AppCompatActivity {
     }
 
     private void initViews() {
-        tvPotName = findViewById(R.id.tv_pot_name);
-        tvBalance = findViewById(R.id.tv_balance);
-        tvBudgetInfo = findViewById(R.id.tv_budget_info);
-        tvEmpty = findViewById(R.id.tv_empty);
-        pbBudget = findViewById(R.id.pb_budget);
-        rvTransactions = findViewById(R.id.rv_transactions);
-        fabAddTransaction = findViewById(R.id.fab_add_transaction);
+        textViewPotName = findViewById(R.id.tv_pot_name);
+        textViewBalance = findViewById(R.id.tv_balance);
+        textViewBudgetInfo = findViewById(R.id.tv_budget_info);
+        textViewEmpty = findViewById(R.id.tv_empty);
+        progressBarBudget = findViewById(R.id.pb_budget);
+        recyclerViewTransactions = findViewById(R.id.rv_transactions);
+        floatingActionButtonAddTransaction = findViewById(R.id.fab_add_transaction);
 
-        findViewById(R.id.iv_back).setOnClickListener(v -> finish());
+        findViewById(R.id.iv_back).setOnClickListener(view -> finish());
     }
 
     private void initListeners() {
-        fabAddTransaction.setOnClickListener(v -> {
+        floatingActionButtonAddTransaction.setOnClickListener(view -> {
             Intent intent = new Intent(this, AddTransactionActivity.class);
             intent.putExtra(Constants.EXTRA_POT_ID, potId);
             startActivity(intent);
         });
 
         // Edit pot
-        findViewById(R.id.iv_edit).setOnClickListener(v -> showEditPotDialog());
+        findViewById(R.id.iv_edit).setOnClickListener(view -> showEditPotDialog());
 
         // Delete pot
-        findViewById(R.id.iv_delete).setOnClickListener(v -> confirmDeletePot());
+        findViewById(R.id.iv_delete).setOnClickListener(view -> confirmDeletePot());
     }
 
     private void setupRecyclerView() {
-        adapter = new TransactionAdapter(transactions, this);
-        rvTransactions.setLayoutManager(new LinearLayoutManager(this));
-        rvTransactions.setAdapter(adapter);
+        transactionAdapter = new TransactionAdapter(transactions, this);
+        transactionAdapter.setOnTransactionClickListener(this::showTransactionOptionsDialog);
+        recyclerViewTransactions.setLayoutManager(new LinearLayoutManager(this));
+        recyclerViewTransactions.setAdapter(transactionAdapter);
+    }
+
+    private void showTransactionOptionsDialog(Transaction transaction) {
+        String[] options = {getString(R.string.title_edit_transaction), getString(R.string.btn_delete)};
+        new AlertDialog.Builder(this)
+                .setTitle(R.string.title_transaction_options)
+                .setItems(options, (dialog, which) -> {
+                    if (which == 0) {
+                        // Sửa giao dịch
+                        Intent intent = new Intent(this, AddTransactionActivity.class);
+                        intent.putExtra(Constants.EXTRA_TRANSACTION_ID, transaction.getId());
+                        startActivity(intent);
+                    } else if (which == 1) {
+                        // Xóa giao dịch
+                        confirmDeleteTransaction(transaction);
+                    }
+                })
+                .show();
+    }
+
+    private void confirmDeleteTransaction(Transaction transaction) {
+        new AlertDialog.Builder(this)
+                .setTitle(R.string.btn_delete)
+                .setMessage(R.string.msg_confirm_delete)
+                .setPositiveButton(R.string.btn_delete, (dialog, which) -> {
+                    databaseManager.deleteTransaction(transaction.getId());
+                    loadData();
+                })
+                .setNegativeButton(R.string.btn_cancel, null)
+                .show();
     }
 
     private void loadData() {
-        Pot pot = dbManager.getPotById(potId);
+        Pot pot = databaseManager.getPotById(potId);
         if (pot == null) {
             finish();
             return;
         }
 
-        tvPotName.setText(pot.getName());
-        tvBalance.setText(CurrencyFormatter.format(pot.getBalance()));
+        textViewPotName.setText(pot.getName());
+        textViewBalance.setText(CurrencyFormatter.format(pot.getBalance()));
 
         int percentage = pot.getBudgetPercentage();
-        pbBudget.setProgress(percentage);
+        progressBarBudget.setProgress(percentage);
 
         String budgetText = percentage + "% " +
                 getString(R.string.label_spent) + " · " +
                 getString(R.string.label_budget) + ": " +
                 CurrencyFormatter.format(pot.getBudgetLimit());
-        tvBudgetInfo.setText(budgetText);
+        textViewBudgetInfo.setText(budgetText);
 
         // Load transactions
-        transactions = dbManager.getTransactionsByPotId(potId);
-        adapter.updateData(transactions);
+        transactions = databaseManager.getTransactionsByPotId(potId);
+        transactionAdapter.updateData(transactions);
 
         if (transactions.isEmpty()) {
-            tvEmpty.setVisibility(View.VISIBLE);
-            rvTransactions.setVisibility(View.GONE);
+            textViewEmpty.setVisibility(View.VISIBLE);
+            recyclerViewTransactions.setVisibility(View.GONE);
         } else {
-            tvEmpty.setVisibility(View.GONE);
-            rvTransactions.setVisibility(View.VISIBLE);
+            textViewEmpty.setVisibility(View.GONE);
+            recyclerViewTransactions.setVisibility(View.VISIBLE);
         }
     }
 
     private void showEditPotDialog() {
-        Pot pot = dbManager.getPotById(potId);
+        Pot pot = databaseManager.getPotById(potId);
         if (pot == null) return;
 
         AddPotDialog dialog = new AddPotDialog();
@@ -138,7 +169,7 @@ public class PotDetailActivity extends AppCompatActivity {
         new AlertDialog.Builder(this)
                 .setMessage(R.string.msg_confirm_delete_pot)
                 .setPositiveButton(R.string.btn_delete, (dialog, which) -> {
-                    dbManager.deletePot(potId);
+                    databaseManager.deletePot(potId);
                     finish();
                 })
                 .setNegativeButton(R.string.btn_cancel, null)

@@ -76,6 +76,7 @@
 
     <!-- Transactions List -->
     <string name="title_transactions">All Transactions</string>
+    <string name="title_transaction_options">Transaction options</string>
     <string name="hint_search">Search by note…</string>
     <string name="label_filter">Filter</string>
     <string name="label_all">All</string>

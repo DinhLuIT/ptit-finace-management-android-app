@@ -76,6 +76,7 @@
 
     <!-- Transactions List -->
     <string name="title_transactions">Tất Cả Giao Dịch</string>
+    <string name="title_transaction_options">Tùy chọn giao dịch</string>
     <string name="hint_search">Tìm theo ghi chú…</string>
     <string name="label_filter">Lọc</string>
     <string name="label_all">Tất cả</string>

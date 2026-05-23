@@ -344,6 +344,79 @@ public class DBManager extends SQLiteOpenHelper {
         db.close();
     }
 
+    public Transaction getTransactionById(int transId) {
+        List<Transaction> list = getTransactionsWithQuery(
+                "SELECT T.*, P.NAME AS POT_NAME, C.NAME AS CAT_NAME, C.ICON AS CAT_ICON " +
+                        "FROM " + Constants.TABLE_TRANSACTIONS + " T " +
+                        "LEFT JOIN " + Constants.TABLE_POTS + " P ON T.POT_ID = P.ID " +
+                        "LEFT JOIN " + Constants.TABLE_CATEGORIES + " C ON T.CATEGORY_ID = C.ID " +
+                        "WHERE T.ID = ?",
+                new String[]{String.valueOf(transId)});
+        if (!list.isEmpty()) {
+            return list.get(0);
+        }
+        return null;
+    }
+
+    public void updateTransaction(Transaction newTrans) {
+        SQLiteDatabase db = getWritableDatabase();
+
+        // 1. Lấy thông tin giao dịch cũ để hoàn lại tiền
+        Cursor cursor = db.query(Constants.TABLE_TRANSACTIONS, null, "ID = ?",
+                new String[]{String.valueOf(newTrans.getId())}, null, null, null);
+        try {
+            if (cursor.moveToFirst()) {
+                double oldAmount = cursor.getDouble(cursor.getColumnIndexOrThrow("AMOUNT"));
+                String oldType = cursor.getString(cursor.getColumnIndexOrThrow("TYPE"));
+                int oldPotId = cursor.getInt(cursor.getColumnIndexOrThrow("POT_ID"));
+
+                // Hoàn lại tiền cho hủ cũ
+                Pot oldPot = getPotByIdInternal(db, oldPotId);
+                if (oldPot != null) {
+                    double oldBalance = oldPot.getBalance();
+                    if (Constants.TYPE_INCOME.equals(oldType)) {
+                        oldBalance -= oldAmount;
+                    } else {
+                        oldBalance += oldAmount;
+                    }
+                    ContentValues oldPotUpdate = new ContentValues();
+                    oldPotUpdate.put("BALANCE", oldBalance);
+                    db.update(Constants.TABLE_POTS, oldPotUpdate, "ID = ?",
+                            new String[]{String.valueOf(oldPotId)});
+                }
+            }
+        } finally {
+            cursor.close();
+        }
+
+        // 2. Cập nhật giao dịch mới
+        ContentValues values = new ContentValues();
+        values.put("POT_ID", newTrans.getPotId());
+        values.put("CATEGORY_ID", newTrans.getCategoryId());
+        values.put("AMOUNT", newTrans.getAmount());
+        values.put("TYPE", newTrans.getType());
+        values.put("DATE", newTrans.getDate());
+        values.put("NOTE", newTrans.getNote());
+        db.update(Constants.TABLE_TRANSACTIONS, values, "ID = ?", new String[]{String.valueOf(newTrans.getId())});
+
+        // 3. Tính tiền cho hủ mới
+        Pot newPot = getPotByIdInternal(db, newTrans.getPotId());
+        if (newPot != null) {
+            double newBalance = newPot.getBalance();
+            if (Constants.TYPE_INCOME.equals(newTrans.getType())) {
+                newBalance += newTrans.getAmount();
+            } else {
+                newBalance -= newTrans.getAmount();
+            }
+            ContentValues newPotUpdate = new ContentValues();
+            newPotUpdate.put("BALANCE", newBalance);
+            db.update(Constants.TABLE_POTS, newPotUpdate, "ID = ?",
+                    new String[]{String.valueOf(newTrans.getPotId())});
+        }
+
+        db.close();
+    }
+
     // Tổng thu nhập trong tháng
     public double getTotalIncomeByMonth(int month, int year) {
         return getTotalByTypeAndMonth(Constants.TYPE_INCOME, month, year);

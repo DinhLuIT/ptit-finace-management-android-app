@@ -4,6 +4,7 @@ import android.app.DatePickerDialog;
 import android.os.Bundle;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -43,6 +44,10 @@ public class AddTransactionActivity extends AppCompatActivity {
     // Nếu mở từ PotDetail, nhận potId để tự chọn
     private int preselectedPotId = -1;
 
+    // Nếu mở để sửa giao dịch
+    private int editTransactionId = -1;
+    private Transaction editTransaction = null;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,14 +55,19 @@ public class AddTransactionActivity extends AppCompatActivity {
 
         dbManager = DBManager.getInstance(this);
         preselectedPotId = getIntent().getIntExtra(Constants.EXTRA_POT_ID, -1);
+        editTransactionId = getIntent().getIntExtra(Constants.EXTRA_TRANSACTION_ID, -1);
 
         initViews();
         initListeners();
         loadData();
 
-        // Mặc định ngày hôm nay
-        selectedDate = DateUtils.getTodayDB();
-        etDate.setText(DateUtils.formatForDisplay(selectedDate));
+        if (editTransactionId != -1) {
+            setupEditMode();
+        } else {
+            // Mặc định ngày hôm nay cho chế độ tạo mới
+            selectedDate = DateUtils.getTodayDB();
+            etDate.setText(DateUtils.formatForDisplay(selectedDate));
+        }
     }
 
     private void initViews() {
@@ -146,9 +156,64 @@ public class AddTransactionActivity extends AppCompatActivity {
                 android.R.layout.simple_dropdown_item_1line, catNames);
         spCategory.setAdapter(catAdapter);
 
-        // Reset selection
-        spCategory.setText("", false);
-        selectedCategoryId = -1;
+        // Reset selection nếu không phải đang set up Edit Mode lần đầu
+        if (editTransaction == null || !currentType.equals(editTransaction.getType()) || spCategory.getText().toString().isEmpty()) {
+            spCategory.setText("", false);
+            selectedCategoryId = -1;
+        }
+    }
+
+    private void setupEditMode() {
+        editTransaction = dbManager.getTransactionById(editTransactionId);
+        if (editTransaction == null) {
+            Toast.makeText(this, "Không tìm thấy giao dịch", Toast.LENGTH_SHORT).show();
+            finish();
+            return;
+        }
+
+        // Đổi tiêu đề và nút
+        TextView tvTitle = findViewById(R.id.tv_toolbar_title);
+        if (tvTitle != null) tvTitle.setText(R.string.title_edit_transaction);
+        btnSave.setText(R.string.btn_save);
+
+        // Nạp dữ liệu cơ bản
+        currentType = editTransaction.getType();
+        if (Constants.TYPE_INCOME.equals(currentType)) {
+            toggleType.check(R.id.btn_income);
+        } else {
+            toggleType.check(R.id.btn_expense);
+        }
+        
+        // Vô hiệu hóa việc đổi loại giao dịch (Thu/Chi) khi đang sửa để đảm bảo logic hoàn tiền không bị rối
+        findViewById(R.id.btn_income).setEnabled(false);
+        findViewById(R.id.btn_expense).setEnabled(false);
+
+        etAmount.setText(String.valueOf(editTransaction.getAmount()));
+        if (editTransaction.getNote() != null) {
+            etNote.setText(editTransaction.getNote());
+        }
+
+        selectedDate = editTransaction.getDate();
+        etDate.setText(DateUtils.formatForDisplay(selectedDate));
+
+        // Nạp Hủ
+        selectedPotId = editTransaction.getPotId();
+        for (Pot pot : potList) {
+            if (pot.getId() == selectedPotId) {
+                spPot.setText(pot.getName(), false);
+                break;
+            }
+        }
+
+        // Load categories dựa trên type mới và nạp danh mục
+        loadCategories();
+        selectedCategoryId = editTransaction.getCategoryId();
+        for (Category cat : categoryList) {
+            if (cat.getId() == selectedCategoryId) {
+                spCategory.setText(cat.getLocalizedName(this), false);
+                break;
+            }
+        }
     }
 
     private void showDatePicker() {
@@ -194,12 +259,19 @@ public class AddTransactionActivity extends AppCompatActivity {
         // Tạo transaction
         String note = etNote.getText() != null ? etNote.getText().toString().trim() : "";
 
-        Transaction transaction = new Transaction(
-                selectedPotId, selectedCategoryId, amount, currentType, selectedDate, note);
+        if (editTransactionId != -1) {
+            Transaction updatedTransaction = new Transaction(
+                    selectedPotId, selectedCategoryId, amount, currentType, selectedDate, note);
+            updatedTransaction.setId(editTransactionId);
+            dbManager.updateTransaction(updatedTransaction);
+            Toast.makeText(this, "Đã cập nhật giao dịch!", Toast.LENGTH_SHORT).show();
+        } else {
+            Transaction transaction = new Transaction(
+                    selectedPotId, selectedCategoryId, amount, currentType, selectedDate, note);
+            dbManager.addTransaction(transaction);
+            Toast.makeText(this, R.string.msg_transaction_saved, Toast.LENGTH_SHORT).show();
+        }
 
-        dbManager.addTransaction(transaction);
-
-        Toast.makeText(this, R.string.msg_transaction_saved, Toast.LENGTH_SHORT).show();
         setResult(RESULT_OK);
         finish();
     }

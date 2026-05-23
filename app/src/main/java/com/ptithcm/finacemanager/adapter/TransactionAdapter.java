@@ -24,6 +24,11 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
 
     private List<Transaction> transactionList;
     private final Context context;
+    private OnTransactionClickListener clickListener;
+
+    public interface OnTransactionClickListener {
+        void onTransactionClick(Transaction transaction);
+    }
 
     // Map icon names to emoji for simple display
     private static final java.util.Map<String, String> ICON_MAP = new java.util.HashMap<>();
@@ -46,6 +51,10 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
         this.context = context;
     }
 
+    public void setOnTransactionClickListener(OnTransactionClickListener listener) {
+        this.clickListener = listener;
+    }
+
     public void updateData(List<Transaction> newList) {
         this.transactionList = newList;
         notifyDataSetChanged();
@@ -61,8 +70,8 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
 
     @Override
     public void onBindViewHolder(@NonNull TransactionViewHolder holder, int position) {
-        Transaction trans = transactionList.get(position);
-        holder.bind(trans);
+        Transaction transaction = transactionList.get(position);
+        holder.bind(transaction);
     }
 
     @Override
@@ -71,55 +80,62 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
     }
 
     class TransactionViewHolder extends RecyclerView.ViewHolder {
-        private final View viewCategoryBg;
-        private final TextView tvCategoryIcon, tvTransCategory, tvTransNote, tvTransAmount, tvTransDate;
+        private final View viewCategoryBackground;
+        private final TextView textViewCategoryIcon, textViewTransactionCategory, textViewTransactionNote, textViewTransactionAmount, textViewTransactionDate;
 
         TransactionViewHolder(@NonNull View itemView) {
             super(itemView);
-            viewCategoryBg = itemView.findViewById(R.id.view_category_bg);
-            tvCategoryIcon = itemView.findViewById(R.id.tv_category_icon);
-            tvTransCategory = itemView.findViewById(R.id.tv_trans_category);
-            tvTransNote = itemView.findViewById(R.id.tv_trans_note);
-            tvTransAmount = itemView.findViewById(R.id.tv_trans_amount);
-            tvTransDate = itemView.findViewById(R.id.tv_trans_date);
+            viewCategoryBackground = itemView.findViewById(R.id.view_category_bg);
+            textViewCategoryIcon = itemView.findViewById(R.id.tv_category_icon);
+            textViewTransactionCategory = itemView.findViewById(R.id.tv_trans_category);
+            textViewTransactionNote = itemView.findViewById(R.id.tv_trans_note);
+            textViewTransactionAmount = itemView.findViewById(R.id.tv_trans_amount);
+            textViewTransactionDate = itemView.findViewById(R.id.tv_trans_date);
         }
 
-        void bind(Transaction trans) {
+        void bind(Transaction transaction) {
             // Category icon (emoji)
-            String iconName = trans.getCategoryIcon();
+            String iconName = transaction.getCategoryIcon();
             String emoji = ICON_MAP.getOrDefault(iconName, "📦");
-            tvCategoryIcon.setText(emoji);
+            textViewCategoryIcon.setText(emoji);
 
             // Màu nền icon theo loại giao dịch
-            int bgColor = trans.isIncome()
+            int backgroundColor = transaction.isIncome()
                     ? ContextCompat.getColor(context, R.color.color_income)
                     : ContextCompat.getColor(context, R.color.color_expense);
-            GradientDrawable bgDrawable = new GradientDrawable();
-            bgDrawable.setShape(GradientDrawable.OVAL);
-            bgDrawable.setColor(bgColor);
-            viewCategoryBg.setBackground(bgDrawable);
+            GradientDrawable backgroundDrawable = new GradientDrawable();
+            backgroundDrawable.setShape(GradientDrawable.OVAL);
+            backgroundDrawable.setColor(backgroundColor);
+            viewCategoryBackground.setBackground(backgroundDrawable);
 
             // Category name & note
-            String catName = trans.getLocalizedCategoryName(context);
-            tvTransCategory.setText(catName.isEmpty() ? "Other" : catName);
+            String categoryName = transaction.getLocalizedCategoryName(context);
+            textViewTransactionCategory.setText(categoryName.isEmpty() ? "Other" : categoryName);
 
-            String note = trans.getNote();
+            String note = transaction.getNote();
             if (note != null && !note.isEmpty()) {
-                tvTransNote.setText(note);
-                tvTransNote.setVisibility(View.VISIBLE);
+                textViewTransactionNote.setText(note);
+                textViewTransactionNote.setVisibility(View.VISIBLE);
             } else {
-                tvTransNote.setText(trans.getPotName() != null ? trans.getPotName() : "");
-                tvTransNote.setVisibility(View.VISIBLE);
+                textViewTransactionNote.setText(transaction.getPotName() != null ? transaction.getPotName() : "");
+                textViewTransactionNote.setVisibility(View.VISIBLE);
             }
 
             // Amount với màu
-            tvTransAmount.setText(CurrencyFormatter.formatWithSign(trans.getAmount(), trans.isIncome()));
-            tvTransAmount.setTextColor(trans.isIncome()
+            textViewTransactionAmount.setText(CurrencyFormatter.formatWithSign(transaction.getAmount(), transaction.isIncome()));
+            textViewTransactionAmount.setTextColor(transaction.isIncome()
                     ? ContextCompat.getColor(context, R.color.color_income)
                     : ContextCompat.getColor(context, R.color.color_expense));
 
             // Date
-            tvTransDate.setText(DateUtils.formatForDisplay(trans.getDate()));
+            textViewTransactionDate.setText(DateUtils.formatForDisplay(transaction.getDate()));
+
+            // Click listener for showing options
+            itemView.setOnClickListener(view -> {
+                if (clickListener != null) {
+                    clickListener.onTransactionClick(transaction);
+                }
+            });
         }
     }
 }

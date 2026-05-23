@@ -1,5 +1,7 @@
 package com.ptithcm.finacemanager.fragment;
 
+import android.app.AlertDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -108,8 +110,39 @@ public class TransactionsFragment extends Fragment {
 
     private void setupRecyclerView() {
         transactionAdapter = new TransactionAdapter(allTransactions, requireContext());
+        transactionAdapter.setOnTransactionClickListener(this::showTransactionOptionsDialog);
         recyclerViewAllTransactions.setLayoutManager(new LinearLayoutManager(requireContext()));
         recyclerViewAllTransactions.setAdapter(transactionAdapter);
+    }
+
+    private void showTransactionOptionsDialog(Transaction transaction) {
+        String[] options = {getString(R.string.title_edit_transaction), getString(R.string.btn_delete)};
+        new AlertDialog.Builder(requireContext())
+                .setTitle(R.string.title_transaction_options)
+                .setItems(options, (dialog, which) -> {
+                    if (which == 0) {
+                        // Sửa giao dịch
+                        Intent intent = new Intent(requireContext(), com.ptithcm.finacemanager.activity.AddTransactionActivity.class);
+                        intent.putExtra(Constants.EXTRA_TRANSACTION_ID, transaction.getId());
+                        startActivity(intent);
+                    } else if (which == 1) {
+                        // Xóa giao dịch
+                        confirmDeleteTransaction(transaction);
+                    }
+                })
+                .show();
+    }
+
+    private void confirmDeleteTransaction(Transaction transaction) {
+        new AlertDialog.Builder(requireContext())
+                .setTitle(R.string.btn_delete)
+                .setMessage(R.string.msg_confirm_delete)
+                .setPositiveButton(R.string.btn_delete, (dialog, which) -> {
+                    databaseManager.deleteTransaction(transaction.getId());
+                    loadData();
+                })
+                .setNegativeButton(R.string.btn_cancel, null)
+                .show();
     }
 
     private void loadData() {
