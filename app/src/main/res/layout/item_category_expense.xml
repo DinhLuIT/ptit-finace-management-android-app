@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:paddingVertical="12dp">
+
+    <!-- Thanh màu dọc đại diện danh mục (đồng bộ với PieChart) -->
+    <View
+        android:id="@+id/view_color_dot"
+        android:layout_width="4dp"
+        android:layout_height="36dp"
+        android:background="@drawable/bg_color_bar" />
+
+    <!-- Icon danh mục (Emoji) -->
+    <TextView
+        android:id="@+id/tv_category_icon"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:layout_marginStart="12dp"
+        android:gravity="center"
+        android:textSize="20sp"
+        tools:text="🍜" />
+
+    <!-- Tên danh mục -->
+    <TextView
+        android:id="@+id/tv_category_name"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/spacing_sm"
+        android:layout_weight="1"
+        android:textColor="@color/color_text_primary"
+        android:textSize="@dimen/text_body"
+        tools:text="Ăn uống" />
+
+    <!-- Cột bên phải: phần trăm + số tiền -->
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="end"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tv_category_percentage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/color_text_primary"
+            android:textSize="@dimen/text_body"
+            android:textStyle="bold"
+            tools:text="41.7%" />
+
+        <TextView
+            android:id="@+id/tv_category_amount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:textColor="@color/color_text_secondary"
+            android:textSize="@dimen/text_caption"
+            tools:text="500,000 ₫" />
+
+    </LinearLayout>
+
+</LinearLayout>

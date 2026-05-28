@@ -1,5 +1,6 @@
 package com.ptithcm.finacemanager.fragment;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,6 +14,7 @@ import androidx.fragment.app.Fragment;
 
 import com.google.android.material.switchmaterial.SwitchMaterial;
 import com.ptithcm.finacemanager.R;
+import com.ptithcm.finacemanager.activity.StatisticsActivity;
 
 public class ProfileFragment extends Fragment {
 
@@ -49,8 +51,10 @@ public class ProfileFragment extends Fragment {
             }
         });
 
+        // Mở màn hình Thống kê chi tiêu
         view.findViewById(R.id.tv_statistics).setOnClickListener(v -> {
-            Toast.makeText(requireContext(), "Coming in Phase 2", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(requireContext(), StatisticsActivity.class);
+            startActivity(intent);
         });
 
         view.findViewById(R.id.tv_exchange_rate).setOnClickListener(v -> {

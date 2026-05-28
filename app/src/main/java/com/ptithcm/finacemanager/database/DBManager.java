@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import com.ptithcm.finacemanager.model.Category;
+import com.ptithcm.finacemanager.model.CategoryExpense;
 import com.ptithcm.finacemanager.model.Pot;
 import com.ptithcm.finacemanager.model.Transaction;
 import com.ptithcm.finacemanager.BuildConfig;
@@ -838,5 +839,104 @@ public class DBManager extends SQLiteOpenHelper {
             cursor.close();
         }
         return categoryId;
+    }
+
+    // =============================================
+    // ========= STATISTICS METHODS ================
+    // =============================================
+
+    /**
+     * Lấy tổng chi tiêu nhóm theo danh mục trong một tháng cụ thể.
+     * Loại trừ các giao dịch chuyển tiền (cat_transfer_out) để thống kê đúng chi tiêu thực tế.
+     *
+     * @param month Tháng cần thống kê (1-12)
+     * @param year  Năm cần thống kê
+     * @return Danh sách CategoryExpense đã sắp xếp giảm dần theo tổng tiền
+     */
+    public List<CategoryExpense> getExpensesByCategory(int month, int year) {
+        List<CategoryExpense> categoryExpenseList = new ArrayList<>();
+        SQLiteDatabase database = getReadableDatabase();
+
+        String monthPattern =String.format("%04d-%02d", year, month) + "%";
+
+        // Truy vấn tổng chi tiêu nhóm theo danh mục, loại trừ chuyển tiền
+        String query = "SELECT C.ID, C.NAME, C.ICON, SUM(T.AMOUNT) AS TOTAL " +
+                "FROM " + Constants.TABLE_TRANSACTIONS + " T " +
+                "INNER JOIN " + Constants.TABLE_CATEGORIES + " C ON T.CATEGORY_ID = C.ID " +
+                "WHERE T.TYPE = ? AND T.DATE LIKE ? AND C.NAME != ? " +
+                "GROUP BY C.ID, C.NAME, C.ICON " +
+                "ORDER BY TOTAL DESC";
+
+        Cursor cursor = database.rawQuery(query,
+                new String[]{Constants.TYPE_EXPENSE, monthPattern, Constants.CAT_TRANSFER_OUT});
+
+        // Tính tổng chi tiêu để tính phần trăm cho từng danh mục
+        double totalExpense = 0;
+        try {
+            if (cursor.moveToFirst()) {
+                do {
+                    CategoryExpense categoryExpense = new CategoryExpense();
+                    categoryExpense.setCategoryId(cursor.getInt(0));
+                    categoryExpense.setCategoryName(cursor.getString(1));
+                    categoryExpense.setCategoryIcon(cursor.getString(2));
+                    categoryExpense.setTotalAmount(cursor.getDouble(3));
+                    categoryExpenseList.add(categoryExpense);
+                    totalExpense += cursor.getDouble(3);
+                } while (cursor.moveToNext());
+            }
+        } finally {
+            cursor.close();
+            database.close();
+        }
+
+        // Tính phần trăm cho từng danh mục dựa trên tổng chi tiêu
+        if (totalExpense > 0) {
+            for (CategoryExpense categoryExpense : categoryExpenseList) {
+                float percentage = (float) ((categoryExpense.getTotalAmount() / totalExpense) * 100);
+                categoryExpense.setPercentage(percentage);
+            }
+        }
+
+        return categoryExpenseList;
+    }
+
+    /**
+     * Lấy ngày giao dịch sớm nhất trong toàn bộ cơ sở dữ liệu.
+     * Trả về null nếu chưa có giao dịch nào.
+     */
+    public String getEarliestTransactionDate() {
+        SQLiteDatabase database = getReadableDatabase();
+        String earliestDate = null;
+        Cursor cursor = database.rawQuery(
+                "SELECT MIN(DATE) FROM " + Constants.TABLE_TRANSACTIONS, null);
+        try {
+            if (cursor.moveToFirst() && !cursor.isNull(0)) {
+                earliestDate = cursor.getString(0);
+            }
+        } finally {
+            cursor.close();
+            database.close();
+        }
+        return earliestDate;
+    }
+
+    /**
+     * Lấy ngày giao dịch muộn nhất trong toàn bộ cơ sở dữ liệu.
+     * Trả về null nếu chưa có giao dịch nào.
+     */
+    public String getLatestTransactionDate() {
+        SQLiteDatabase database = getReadableDatabase();
+        String latestDate = null;
+        Cursor cursor = database.rawQuery(
+                "SELECT MAX(DATE) FROM " + Constants.TABLE_TRANSACTIONS, null);
+        try {
+            if (cursor.moveToFirst() && !cursor.isNull(0)) {
+                latestDate = cursor.getString(0);
+            }
+        } finally {
+            cursor.close();
+            database.close();
+        }
+        return latestDate;
     }
 }

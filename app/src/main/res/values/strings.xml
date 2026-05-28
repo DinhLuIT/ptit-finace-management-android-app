@@ -139,4 +139,14 @@
     <string name="label_this_week">Tuần này</string>
     <string name="label_this_month">Tháng này</string>
     <string name="label_empty_state">Chưa có gì ở đây</string>
+
+    <!-- Statistics -->
+    <string name="title_statistics">Thống Kê Chi Tiêu</string>
+    <string name="label_expense_breakdown">Phân bổ chi tiêu</string>
+    <string name="label_detail_by_category">Chi tiết theo danh mục</string>
+    <string name="label_total_expense">Tổng chi</string>
+    <string name="label_no_expense_data">Chưa có dữ liệu chi tiêu\ntrong tháng này</string>
+    <string name="label_previous_month">Tháng trước</string>
+    <string name="label_next_month">Tháng sau</string>
+    <string name="format_month_year" formatted="false">Tháng %02d/%d</string>
 </resources>

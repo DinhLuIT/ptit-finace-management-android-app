@@ -43,6 +43,11 @@
             android:name=".activity.PotDetailActivity"
             android:exported="false" />
 
+        <!-- Statistics -->
+        <activity
+            android:name=".activity.StatisticsActivity"
+            android:exported="false" />
+
     </application>
 
 </manifest>
