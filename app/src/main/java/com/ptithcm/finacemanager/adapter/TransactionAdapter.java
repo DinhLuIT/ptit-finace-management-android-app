@@ -44,6 +44,7 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
         ICON_MAP.put("ic_salary", "💵");
         ICON_MAP.put("ic_gift", "🎁");
         ICON_MAP.put("ic_other", "📦");
+        ICON_MAP.put("ic_transfer", "🔄");
     }
 
     public TransactionAdapter(List<Transaction> transactionList, Context context) {

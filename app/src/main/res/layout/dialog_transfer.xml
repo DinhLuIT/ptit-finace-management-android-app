@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="@dimen/spacing_lg">
+
+    <!-- Tiêu đề -->
+    <TextView
+        android:id="@+id/tv_dialog_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/title_transfer"
+        android:textColor="@color/color_text_primary"
+        android:textSize="@dimen/text_title"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:layout_marginBottom="@dimen/spacing_lg" />
+
+    <!-- Hủ nguồn -->
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/til_source_pot"
+        style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/label_source_pot"
+        android:layout_marginBottom="@dimen/spacing_md">
+
+        <AutoCompleteTextView
+            android:id="@+id/sp_source_pot"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="none"
+            android:focusable="false" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <!-- Hủ đích -->
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/til_dest_pot"
+        style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/label_destination_pot"
+        android:layout_marginBottom="@dimen/spacing_md">
+
+        <AutoCompleteTextView
+            android:id="@+id/sp_dest_pot"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="none"
+            android:focusable="false" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <!-- Số tiền -->
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/til_amount"
+        style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/hint_transfer_amount"
+        android:layout_marginBottom="@dimen/spacing_md"
+        app:startIconDrawable="@drawable/ic_add"
+        app:startIconTint="@color/color_primary">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/et_amount"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="numberDecimal" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <!-- Ghi chú -->
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/til_note"
+        style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/hint_transfer_note"
+        android:layout_marginBottom="@dimen/spacing_lg">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/et_note"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="text" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <!-- Nút Chuyển tiền + Hủy -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="end">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_cancel"
+            style="@style/Widget.Material3.Button.TextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/btn_cancel"
+            android:layout_marginEnd="@dimen/spacing_sm" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_transfer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/title_transfer"
+            app:backgroundTint="@color/color_primary" />
+    </LinearLayout>
+
+</LinearLayout>

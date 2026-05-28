@@ -3,7 +3,7 @@ package com.ptithcm.finacemanager.utils;
 public class Constants {
     // Database
     public static final String DATABASE_NAME = "finance_manager.sqlite";
-    public static final int DATABASE_VERSION = 3;
+    public static final int DATABASE_VERSION = 4;
 
     // Tables
     public static final String TABLE_POTS = "POTS";
@@ -14,11 +14,16 @@ public class Constants {
     // Transaction Types
     public static final String TYPE_INCOME = "INCOME";
     public static final String TYPE_EXPENSE = "EXPENSE";
+    public static final String TYPE_TRANSFER = "TRANSFER";
 
     // Category Types
     public static final String CAT_TYPE_INCOME = "INCOME";
     public static final String CAT_TYPE_EXPENSE = "EXPENSE";
     public static final String CAT_TYPE_BOTH = "BOTH";
+
+    // Danh mục hệ thống cho chuyển tiền (lưu dưới dạng resource key)
+    public static final String CAT_TRANSFER_OUT = "cat_transfer_out";
+    public static final String CAT_TRANSFER_IN = "cat_transfer_in";
 
     // SharedPreferences
     public static final String PREF_NAME = "finance_manager_prefs";
@@ -36,6 +41,7 @@ public class Constants {
     public static final int REQUEST_ADD_TRANSACTION = 100;
     public static final int REQUEST_ADD_POT = 101;
     public static final int REQUEST_EDIT_POT = 102;
+    public static final int REQUEST_TRANSFER = 103;
 
     // Date Formats
     public static final String DATE_FORMAT_DB = "yyyy-MM-dd";

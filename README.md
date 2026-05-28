@@ -490,11 +490,11 @@ CREATE TABLE RECURRING_TRANSACTIONS (
 
 ### Phase 2: Enhanced Features 🟡
 - [x] Model Category + bảng CATEGORIES + seed data
-- [ ] TransactionsFragment – Lịch sử, filter, search
+- [x] TransactionsFragment – Lịch sử, filter, search
 - [ ] StatisticsActivity – Biểu đồ (MPAndroidChart)
 - [ ] Cảnh báo ngân sách (Notification)
-- [ ] Sửa/Xóa giao dịch + hoàn lại balance
-- [ ] Chuyển tiền giữa các hủ
+- [x] Sửa/Xóa giao dịch + hoàn lại balance
+- [x] Chuyển tiền giữa các hủ (Speed Dial FAB + TransferDialog + logic kế toán kép)
 - [ ] Empty states, animations, transitions
 
 ### Phase 3: Advanced Features 🟢

@@ -106,10 +106,26 @@
     <string name="cat_salary">Salary</string>
     <string name="cat_gift">Gift</string>
     <string name="cat_other">Other</string>
+    <string name="cat_transfer_out">Transfer Out</string>
+    <string name="cat_transfer_in">Transfer In</string>
 
     <!-- Dialogs -->
     <string name="msg_confirm_delete">Are you sure you want to delete this?</string>
     <string name="msg_confirm_delete_pot">Are you sure you want to delete this pot? All transactions in this pot will be deleted.</string>
+
+    <!-- Transfer -->
+    <string name="title_transfer">Transfer Money</string>
+    <string name="label_source_pot">Source pot</string>
+    <string name="label_destination_pot">Destination pot</string>
+    <string name="hint_transfer_amount">Transfer amount</string>
+    <string name="hint_transfer_note">Note (optional)</string>
+    <string name="error_same_pot">Source and destination pots cannot be the same</string>
+    <string name="error_insufficient_balance">Insufficient balance in source pot</string>
+    <string name="error_source_pot_not_selected">Please select a source pot</string>
+    <string name="error_dest_pot_not_selected">Please select a destination pot</string>
+    <string name="msg_transfer_success">Transfer successful!</string>
+    <string name="label_add_transaction">Add transaction</string>
+    <string name="label_transfer">Transfer</string>
 
     <!-- Formats -->
     <string name="format_currency">%s ₫</string>

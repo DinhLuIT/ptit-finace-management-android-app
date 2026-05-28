@@ -106,10 +106,26 @@
     <string name="cat_salary">Lương</string>
     <string name="cat_gift">Quà tặng</string>
     <string name="cat_other">Khác</string>
+    <string name="cat_transfer_out">Chuyển đi</string>
+    <string name="cat_transfer_in">Nhận từ</string>
 
     <!-- Dialogs -->
     <string name="msg_confirm_delete">Bạn có chắc chắn muốn xóa không?</string>
     <string name="msg_confirm_delete_pot">Bạn có chắc chắn muốn xóa hủ này? Tất cả giao dịch trong hủ sẽ bị xóa.</string>
+
+    <!-- Transfer -->
+    <string name="title_transfer">Chuyển Tiền</string>
+    <string name="label_source_pot">Hủ nguồn</string>
+    <string name="label_destination_pot">Hủ đích</string>
+    <string name="hint_transfer_amount">Số tiền chuyển</string>
+    <string name="hint_transfer_note">Ghi chú (tùy chọn)</string>
+    <string name="error_same_pot">Hủ nguồn và hủ đích không được trùng nhau</string>
+    <string name="error_insufficient_balance">Số dư hủ nguồn không đủ</string>
+    <string name="error_source_pot_not_selected">Vui lòng chọn hủ nguồn</string>
+    <string name="error_dest_pot_not_selected">Vui lòng chọn hủ đích</string>
+    <string name="msg_transfer_success">Chuyển tiền thành công!</string>
+    <string name="label_add_transaction">Thêm giao dịch</string>
+    <string name="label_transfer">Chuyển tiền</string>
 
     <!-- Formats -->
     <string name="format_currency">%s ₫</string>
