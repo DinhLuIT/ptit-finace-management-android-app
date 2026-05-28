@@ -34,8 +34,12 @@ import java.util.List;
 public class HomeFragment extends Fragment {
 
     private TextView textViewTotalBalance, textViewMonthlyIncome, textViewMonthlyExpense;
-    private TextView textViewEmptyTransactions, textViewViewAll;
+    private TextView textViewViewAll;
     private RecyclerView recyclerViewRecentTransactions;
+
+    // Empty State views
+    private View emptyStateContainer;
+    private TextView tvEmptyIcon, tvEmptyTitle, tvEmptySubtitle;
 
     // Speed Dial FAB
     private FloatingActionButton floatingActionButtonMain;
@@ -76,9 +80,19 @@ public class HomeFragment extends Fragment {
         textViewTotalBalance = view.findViewById(R.id.tv_total_balance);
         textViewMonthlyIncome = view.findViewById(R.id.tv_monthly_income);
         textViewMonthlyExpense = view.findViewById(R.id.tv_monthly_expense);
-        textViewEmptyTransactions = view.findViewById(R.id.tv_empty_transactions);
         textViewViewAll = view.findViewById(R.id.tv_view_all);
         recyclerViewRecentTransactions = view.findViewById(R.id.rv_recent_transactions);
+
+        // Empty State – sử dụng layout tái sử dụng
+        emptyStateContainer = view.findViewById(R.id.include_empty_state);
+        tvEmptyIcon = emptyStateContainer.findViewById(R.id.tv_empty_icon);
+        tvEmptyTitle = emptyStateContainer.findViewById(R.id.tv_empty_title);
+        tvEmptySubtitle = emptyStateContainer.findViewById(R.id.tv_empty_subtitle);
+
+        // Cấu hình nội dung Empty State cho phần giao dịch gần đây
+        tvEmptyIcon.setText("✨");
+        tvEmptyTitle.setText(R.string.empty_home_transactions_title);
+        tvEmptySubtitle.setText(R.string.empty_home_transactions_subtitle);
 
         // Speed Dial FAB
         floatingActionButtonMain = view.findViewById(R.id.fab_main);
@@ -271,10 +285,10 @@ public class HomeFragment extends Fragment {
 
         // Hiển thị empty state
         if (recentTransactions.isEmpty()) {
-            textViewEmptyTransactions.setVisibility(View.VISIBLE);
+            emptyStateContainer.setVisibility(View.VISIBLE);
             recyclerViewRecentTransactions.setVisibility(View.GONE);
         } else {
-            textViewEmptyTransactions.setVisibility(View.GONE);
+            emptyStateContainer.setVisibility(View.GONE);
             recyclerViewRecentTransactions.setVisibility(View.VISIBLE);
         }
     }

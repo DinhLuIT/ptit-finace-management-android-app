@@ -3,15 +3,15 @@
     <!-- Background track -->
     <item android:id="@android:id/background">
         <shape android:shape="rectangle">
-            <corners android:radius="8dp" />
-            <solid android:color="#F0F2F5" />
+            <corners android:radius="6dp" />
+            <solid android:color="#E0E0E0" />
         </shape>
     </item>
     <!-- Progress fill -->
     <item android:id="@android:id/progress">
         <clip>
             <shape android:shape="rectangle">
-                <corners android:radius="8dp" />
+                <corners android:radius="6dp" />
                 <solid android:color="@color/color_primary" />
             </shape>
         </clip>

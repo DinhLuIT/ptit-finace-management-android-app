@@ -149,4 +149,43 @@
     <string name="label_previous_month">Previous month</string>
     <string name="label_next_month">Next month</string>
     <string name="format_month_year" formatted="false">Month %02d/%d</string>
+
+    <!-- Notification Channel -->
+    <string name="notification_channel_budget">Budget alerts</string>
+    <string name="notification_channel_budget_desc">Notifications when spending nears or exceeds pot budget</string>
+
+    <!-- Notification Content -->
+    <string name="notification_budget_warning_title">⚠️ Budget warning</string>
+    <string name="notification_budget_warning_body" formatted="false">Pot "%s" has used %d%% of its budget. Spend wisely!</string>
+    <string name="notification_budget_danger_title">🚨 Budget exceeded!</string>
+    <string name="notification_budget_danger_body">Pot \"%s\" has exceeded its allocated budget. Review your spending now!</string>
+
+    <!-- Budget Alert Dialog -->
+    <string name="alert_budget_warning_title">Budget almost reached!</string>
+    <string name="alert_budget_danger_title">Budget exceeded!</string>
+    <string name="alert_budget_pot_label">Pot: %s</string>
+    <string name="alert_budget_warning_message">You\'re approaching your budget limit.\nConsider spending more carefully! 💡</string>
+    <string name="alert_budget_danger_message">You\'ve exceeded your allocated budget.\nConsider adjusting your spending plan! 🔄</string>
+    <string name="btn_understood">I understand</string>
+
+    <!-- Profile – Notification Toggle -->
+    <string name="label_notification_budget">Budget alerts</string>
+    <string name="label_notification_budget_desc">Get notified when pots are near or over budget</string>
+
+    <!-- Empty States -->
+    <string name="empty_default_title">Nothing here yet</string>
+    <string name="empty_default_subtitle">Let\'s get started!</string>
+    <string name="empty_pots_title">No spending pots yet</string>
+    <string name="empty_pots_subtitle">Create your first pot to start\nmanaging finances smartly! 🏺</string>
+    <string name="empty_pots_action">Create new pot</string>
+    <string name="empty_transactions_title">No transactions yet</string>
+    <string name="empty_transactions_subtitle">Your income and expense records\nwill appear here 📋</string>
+    <string name="empty_home_transactions_title">No recent transactions</string>
+    <string name="empty_home_transactions_subtitle">Start recording your transactions\nto track finances easily! ✨</string>
+    <string name="empty_statistics_title">No expense data</string>
+    <string name="empty_statistics_subtitle">No expenses recorded\nfor this month 📊</string>
+    <string name="empty_search_title">No results found</string>
+    <string name="empty_search_subtitle">Try searching with different keywords\nor reset filters 🔍</string>
+    <string name="btn_add_new">Add new</string>
+    <string name="btn_reset_filter">Reset filter</string>
 </resources>

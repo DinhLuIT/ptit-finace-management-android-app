@@ -19,7 +19,10 @@ import com.ptithcm.finacemanager.model.Category;
 import com.ptithcm.finacemanager.model.Pot;
 import com.ptithcm.finacemanager.model.Transaction;
 import com.ptithcm.finacemanager.utils.Constants;
+import com.ptithcm.finacemanager.utils.CustomToast;
 import com.ptithcm.finacemanager.utils.DateUtils;
+import com.ptithcm.finacemanager.utils.NotificationHelper;
+import com.ptithcm.finacemanager.dialog.BudgetAlertDialog;
 
 import java.util.Calendar;
 import java.util.List;
@@ -166,7 +169,7 @@ public class AddTransactionActivity extends AppCompatActivity {
     private void setupEditMode() {
         editTransaction = dbManager.getTransactionById(editTransactionId);
         if (editTransaction == null) {
-            Toast.makeText(this, "Không tìm thấy giao dịch", Toast.LENGTH_SHORT).show();
+            CustomToast.showError(this, "Không tìm thấy giao dịch");
             finish();
             return;
         }
@@ -264,15 +267,77 @@ public class AddTransactionActivity extends AppCompatActivity {
                     selectedPotId, selectedCategoryId, amount, currentType, selectedDate, note);
             updatedTransaction.setId(editTransactionId);
             dbManager.updateTransaction(updatedTransaction);
-            Toast.makeText(this, "Đã cập nhật giao dịch!", Toast.LENGTH_SHORT).show();
+            CustomToast.showSuccess(this, getString(R.string.msg_transaction_saved));
         } else {
             Transaction transaction = new Transaction(
                     selectedPotId, selectedCategoryId, amount, currentType, selectedDate, note);
             dbManager.addTransaction(transaction);
-            Toast.makeText(this, R.string.msg_transaction_saved, Toast.LENGTH_SHORT).show();
+            CustomToast.showSuccess(this, getString(R.string.msg_transaction_saved));
         }
 
-        setResult(RESULT_OK);
-        finish();
+        // Kiểm tra ngân sách và hiện cảnh báo nếu cần (chỉ cho EXPENSE)
+        if (Constants.TYPE_EXPENSE.equals(currentType)) {
+            checkBudgetAndAlert();
+        } else {
+            setResult(RESULT_OK);
+            finish();
+        }
+    }
+
+    /**
+     * Kiểm tra ngân sách hũ sau khi thêm/sửa giao dịch chi tiêu.
+     * Nếu vượt ngưỡng 80% hoặc 100%, hiển thị BudgetAlertDialog siêu đẹp
+     * và gửi System Notification.
+     */
+    private void checkBudgetAndAlert() {
+        Pot pot = dbManager.getPotById(selectedPotId);
+        if (pot == null || pot.getBudgetLimit() <= 0) {
+            setResult(RESULT_OK);
+            finish();
+            return;
+        }
+
+        double budgetLimit = pot.getBudgetLimit();
+        double currentBalance = pot.getBalance();
+        double spent = budgetLimit - currentBalance;
+        if (spent < 0) spent = 0;
+        double spentPercentage = spent / budgetLimit;
+
+        if (spentPercentage >= NotificationHelper.NOTIFICATION_DANGER_THRESHOLD) {
+            // >= 100%: Hiện dialog cảnh báo MỨC NGUY HIỂM
+            showBudgetAlert(pot.getName(), budgetLimit, currentBalance, spentPercentage, true);
+            NotificationHelper.checkAndNotifyBudget(this, pot.getId(), pot.getName(), budgetLimit, currentBalance);
+        } else if (spentPercentage >= NotificationHelper.NOTIFICATION_WARNING_THRESHOLD) {
+            // >= 80%: Hiện dialog cảnh báo MỨC CẢNH BÁO
+            showBudgetAlert(pot.getName(), budgetLimit, currentBalance, spentPercentage, false);
+            NotificationHelper.checkAndNotifyBudget(this, pot.getId(), pot.getName(), budgetLimit, currentBalance);
+        } else {
+            setResult(RESULT_OK);
+            finish();
+        }
+    }
+
+    /**
+     * Hiển thị BudgetAlertDialog siêu đẹp. Khi người dùng bấm "Tôi đã hiểu",
+     * dialog tự đóng và Activity sẽ finish().
+     */
+    private void showBudgetAlert(String potName, double budgetLimit,
+                                  double currentBalance, double spentPercentage, boolean isDanger) {
+        BudgetAlertDialog dialog = BudgetAlertDialog.newInstance(
+                potName, budgetLimit, currentBalance, spentPercentage, isDanger);
+
+        // Lắng nghe khi dialog bị dismiss (bấm "Tôi đã hiểu" hoặc bấm ngoài) → finish Activity
+        dialog.setOnDismissListener(d -> {
+            setResult(RESULT_OK);
+            finish();
+        });
+
+        dialog.show(getSupportFragmentManager(), "BudgetAlertDialog");
+    }
+
+    @Override
+    public void finish() {
+        super.finish();
+        overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
     }
 }

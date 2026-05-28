@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Dialog cảnh báo ngân sách – Thiết kế cao cấp với gradient, icon lớn và typography nổi bật -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_dialog_rounded"
+    android:orientation="vertical"
+    android:paddingHorizontal="28dp"
+    android:paddingTop="32dp"
+    android:paddingBottom="24dp">
+
+    <!-- Icon cảnh báo kích thước lớn (emoji) với nền tròn gradient -->
+    <FrameLayout
+        android:layout_width="88dp"
+        android:layout_height="88dp"
+        android:layout_gravity="center_horizontal">
+
+        <!-- Vòng tròn nền gradient -->
+        <View
+            android:id="@+id/view_alert_circle"
+            android:layout_width="88dp"
+            android:layout_height="88dp"
+            android:background="@drawable/bg_circle" />
+
+        <!-- Emoji icon cảnh báo -->
+        <TextView
+            android:id="@+id/tv_alert_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="⚠️"
+            android:textSize="40sp" />
+    </FrameLayout>
+
+    <!-- Tiêu đề cảnh báo (in đậm, màu sắc nổi bật) -->
+    <TextView
+        android:id="@+id/tv_alert_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:gravity="center"
+        android:textColor="@color/color_text_primary"
+        android:textSize="20sp"
+        android:textStyle="bold" />
+
+    <!-- Tên hũ chi tiêu bị ảnh hưởng -->
+    <TextView
+        android:id="@+id/tv_alert_pot_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:gravity="center"
+        android:textColor="@color/color_text_secondary"
+        android:textSize="14sp" />
+
+    <!-- Thanh progress hiển thị mức ngân sách đã dùng -->
+    <ProgressBar
+        android:id="@+id/pb_alert_budget"
+        style="@android:style/Widget.ProgressBar.Horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="12dp"
+        android:layout_marginTop="20dp"
+        android:max="100"
+        android:progressDrawable="@drawable/bg_progress_bar_rounded" />
+
+    <!-- Phần trăm đã chi tiêu (hiển thị lớn, nổi bật) -->
+    <TextView
+        android:id="@+id/tv_alert_percentage"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:gravity="center"
+        android:textSize="28sp"
+        android:textStyle="bold" />
+
+    <!-- Mô tả chi tiết: Đã chi / Ngân sách -->
+    <TextView
+        android:id="@+id/tv_alert_detail"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:gravity="center"
+        android:textColor="@color/color_text_secondary"
+        android:textSize="13sp" />
+
+    <!-- Lời nhắn nhẹ nhàng hướng dẫn người dùng -->
+    <TextView
+        android:id="@+id/tv_alert_message"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:gravity="center"
+        android:lineSpacingExtra="4dp"
+        android:textColor="@color/color_text_secondary"
+        android:textSize="14sp" />
+
+    <!-- Nút "Tôi đã hiểu" – bo tròn hoàn toàn (Pill shape) -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_alert_dismiss"
+        android:layout_width="match_parent"
+        android:layout_height="52dp"
+        android:layout_marginTop="24dp"
+        android:text="@string/btn_understood"
+        android:textAllCaps="false"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:cornerRadius="26dp"
+        app:elevation="4dp" />
+
+</LinearLayout>

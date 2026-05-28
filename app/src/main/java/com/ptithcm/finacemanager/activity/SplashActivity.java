@@ -14,6 +14,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.ptithcm.finacemanager.R;
 import com.ptithcm.finacemanager.utils.Constants;
+import com.ptithcm.finacemanager.utils.NotificationHelper;
 
 public class SplashActivity extends AppCompatActivity {
 
@@ -21,6 +22,9 @@ public class SplashActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
+
+        // Đăng ký Notification Channel khi khởi động app (idempotent – gọi nhiều lần không lỗi)
+        NotificationHelper.createNotificationChannel(this);
 
         // Fade-in animation
         ImageView ivLogo = findViewById(R.id.iv_logo);

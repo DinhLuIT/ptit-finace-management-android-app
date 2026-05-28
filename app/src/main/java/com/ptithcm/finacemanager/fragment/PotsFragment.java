@@ -13,6 +13,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.ptithcm.finacemanager.R;
 import com.ptithcm.finacemanager.activity.PotDetailActivity;
@@ -28,8 +29,12 @@ import java.util.List;
 public class PotsFragment extends Fragment implements PotAdapter.OnPotClickListener {
 
     private RecyclerView rvPots;
-    private TextView tvEmptyPots;
     private FloatingActionButton fabAddPot;
+
+    // Empty State views
+    private View emptyStateContainer;
+    private TextView tvEmptyIcon, tvEmptyTitle, tvEmptySubtitle;
+    private MaterialButton btnEmptyAction;
 
     private DBManager dbManager;
     private PotAdapter adapter;
@@ -59,12 +64,28 @@ public class PotsFragment extends Fragment implements PotAdapter.OnPotClickListe
 
     private void initViews(View view) {
         rvPots = view.findViewById(R.id.rv_pots);
-        tvEmptyPots = view.findViewById(R.id.tv_empty_pots);
         fabAddPot = view.findViewById(R.id.fab_add_pot);
+
+        // Empty State – sử dụng layout tái sử dụng
+        emptyStateContainer = view.findViewById(R.id.include_empty_state);
+        tvEmptyIcon = emptyStateContainer.findViewById(R.id.tv_empty_icon);
+        tvEmptyTitle = emptyStateContainer.findViewById(R.id.tv_empty_title);
+        tvEmptySubtitle = emptyStateContainer.findViewById(R.id.tv_empty_subtitle);
+        btnEmptyAction = emptyStateContainer.findViewById(R.id.btn_empty_action);
+
+        // Cấu hình nội dung Empty State cho màn hình Hủ
+        tvEmptyIcon.setText("🏺");
+        tvEmptyTitle.setText(R.string.empty_pots_title);
+        tvEmptySubtitle.setText(R.string.empty_pots_subtitle);
+        btnEmptyAction.setText(R.string.empty_pots_action);
+        btnEmptyAction.setVisibility(View.VISIBLE);
     }
 
     private void initListeners() {
         fabAddPot.setOnClickListener(v -> showAddPotDialog());
+
+        // Nút hành động trong Empty State cũng mở dialog tạo hủ mới
+        btnEmptyAction.setOnClickListener(v -> showAddPotDialog());
     }
 
     private void setupRecyclerView() {
@@ -78,10 +99,10 @@ public class PotsFragment extends Fragment implements PotAdapter.OnPotClickListe
         adapter.updateData(potList);
 
         if (potList.isEmpty()) {
-            tvEmptyPots.setVisibility(View.VISIBLE);
+            emptyStateContainer.setVisibility(View.VISIBLE);
             rvPots.setVisibility(View.GONE);
         } else {
-            tvEmptyPots.setVisibility(View.GONE);
+            emptyStateContainer.setVisibility(View.GONE);
             rvPots.setVisibility(View.VISIBLE);
         }
     }

@@ -139,16 +139,12 @@
                 android:nestedScrollingEnabled="false"
                 android:padding="@dimen/spacing_sm" />
 
-            <TextView
-                android:id="@+id/tv_empty_transactions"
+            <!-- Empty State cho giao dịch gần đây -->
+            <include
+                android:id="@+id/include_empty_state"
+                layout="@layout/layout_empty_state"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:padding="@dimen/spacing_xxl"
-                android:text="@string/label_no_transactions"
-                android:textColor="@color/color_text_hint"
-                android:textSize="@dimen/text_body"
-                android:visibility="gone" />
+                android:layout_height="wrap_content" />
 
         </LinearLayout>
     </ScrollView>

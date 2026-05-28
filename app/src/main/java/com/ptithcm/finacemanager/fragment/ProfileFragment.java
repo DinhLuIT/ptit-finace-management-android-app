@@ -15,10 +15,12 @@ import androidx.fragment.app.Fragment;
 import com.google.android.material.switchmaterial.SwitchMaterial;
 import com.ptithcm.finacemanager.R;
 import com.ptithcm.finacemanager.activity.StatisticsActivity;
+import com.ptithcm.finacemanager.utils.NotificationHelper;
 
 public class ProfileFragment extends Fragment {
 
     private SwitchMaterial switchDarkMode;
+    private SwitchMaterial switchNotification;
 
     @Nullable
     @Override
@@ -36,19 +38,29 @@ public class ProfileFragment extends Fragment {
 
     private void initViews(View view) {
         switchDarkMode = view.findViewById(R.id.switch_dark_mode);
+        switchNotification = view.findViewById(R.id.switch_notification);
 
         // Đặt trạng thái ban đầu cho dark mode
         int currentMode = AppCompatDelegate.getDefaultNightMode();
         switchDarkMode.setChecked(currentMode == AppCompatDelegate.MODE_NIGHT_YES);
+
+        // Đặt trạng thái ban đầu cho notification từ SharedPreferences
+        switchNotification.setChecked(NotificationHelper.isNotificationEnabled(requireContext()));
     }
 
     private void initListeners(View view) {
+        // Toggle Dark Mode
         switchDarkMode.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (isChecked) {
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
             } else {
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
             }
+        });
+
+        // Toggle Notification Budget Alert
+        switchNotification.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            NotificationHelper.setNotificationEnabled(requireContext(), isChecked);
         });
 
         // Mở màn hình Thống kê chi tiêu

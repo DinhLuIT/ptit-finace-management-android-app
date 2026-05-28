@@ -44,7 +44,12 @@ com.ptithcm.finacemanager/
 ├── database/              ← SQLite helper (DBManager)
 ├── api/                   ← API clients (Exchange Rate)
 ├── utils/                 ← Utility/Helper classes
+│   ├── CustomToast         ← Toast tùy chỉnh (Success/Error/Warning)
+│   ├── NotificationHelper  ← Quản lý Local Notification cảnh báo ngân sách
+│   └── ...
 └── dialog/                ← Custom DialogFragments
+    ├── BudgetAlertDialog   ← Dialog cảnh báo ngân sách siêu đẹp
+    └── ...
 ```
 
 ### Nguyên tắc kiến trúc
@@ -234,7 +239,7 @@ CurrencyFormatter.format(1500000);  // → "1,500,000 ₫"
 
 ```java
 // ✅ Validate input trước khi lưu DB
-// ✅ Hiển thị Toast hoặc Snackbar cho user feedback
+// ✅ Sử dụng CustomToast cho user feedback (thay thế Toast mặc định)
 // ✅ Log error với TAG rõ ràng
 
 if (amount <= 0) {
@@ -244,10 +249,10 @@ if (amount <= 0) {
 
 try {
     dbManager.addTransaction(transaction);
-    Toast.makeText(this, R.string.msg_transaction_saved, Toast.LENGTH_SHORT).show();
+    CustomToast.showSuccess(this, R.string.msg_transaction_saved);
 } catch (Exception e) {
     Log.e(TAG, "Error saving transaction", e);
-    Toast.makeText(this, R.string.error_save_failed, Toast.LENGTH_SHORT).show();
+    CustomToast.showError(this, R.string.error_save_failed);
 }
 ```
 
@@ -488,20 +493,24 @@ CREATE TABLE RECURRING_TRANSACTIONS (
 - [x] DBManager mở rộng – CRUD đầy đủ
 - [x] UI/UX: layouts, colors, strings (I18N)
 
-### Phase 2: Enhanced Features 🟡
+### Phase 2: Enhanced Features ✅
 - [x] Model Category + bảng CATEGORIES + seed data
 - [x] TransactionsFragment – Lịch sử, filter, search
 - [x] StatisticsActivity – Biểu đồ PieChart (MPAndroidChart)
-- [ ] Cảnh báo ngân sách (Notification)
+- [x] Cảnh báo ngân sách (BudgetAlertDialog siêu đẹp + System Notification)
 - [x] Sửa/Xóa giao dịch + hoàn lại balance
 - [x] Chuyển tiền giữa các hủ (Speed Dial FAB + TransferDialog + logic kế toán kép)
-- [ ] Empty states, animations, transitions
+- [x] Empty states cao cấp (Reusable layout + Emoji icons + CTA buttons)
+- [x] Animations & transitions (Slide, Fade, Bounce)
+- [x] CustomToast (Thay thế Toast mặc định bằng toast bo tròn có icon trạng thái)
+- [x] NotificationHelper (Quản lý Notification Channel + Budget alerts)
+- [x] ProfileFragment – Toggle bật/tắt cảnh báo ngân sách
 
 ### Phase 3: Advanced Features 🟢
 - [ ] ExchangeRateAPI – Tỷ giá ngoại tệ
 - [ ] Export báo cáo CSV
 - [ ] Mục tiêu tiết kiệm (Savings Goals)
 - [ ] Giao dịch định kỳ (Recurring Transactions + WorkManager)
-- [ ] Dark Mode toggle
+- [ ] Dark Mode toggle (lưu SharedPreferences)
 - [ ] Biometric authentication (Fingerprint)
 - [ ] Testing & Performance optimization

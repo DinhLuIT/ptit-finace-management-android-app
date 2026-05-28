@@ -7,7 +7,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -19,6 +18,8 @@ import com.ptithcm.finacemanager.R;
 import com.ptithcm.finacemanager.database.DBManager;
 import com.ptithcm.finacemanager.model.Pot;
 import com.ptithcm.finacemanager.utils.CurrencyFormatter;
+import com.ptithcm.finacemanager.utils.CustomToast;
+import com.ptithcm.finacemanager.utils.NotificationHelper;
 
 import java.util.List;
 
@@ -201,13 +202,38 @@ public class TransferDialog extends DialogFragment {
                 selectedSourcePotId, selectedDestinationPotId, transferAmount, note);
 
         if (transferSuccess) {
-            Toast.makeText(requireContext(), R.string.msg_transfer_success, Toast.LENGTH_SHORT).show();
+            CustomToast.showSuccess(requireContext(), getString(R.string.msg_transfer_success));
+
+            // Kiểm tra ngân sách hủ nguồn sau khi chuyển tiền (vì tiền bị trừ đi)
+            checkBudgetAfterTransfer();
+
             if (transferCompleteListener != null) {
                 transferCompleteListener.onTransferComplete();
             }
             dismiss();
         } else {
-            Toast.makeText(requireContext(), R.string.error_insufficient_balance, Toast.LENGTH_SHORT).show();
+            CustomToast.showError(requireContext(), getString(R.string.error_insufficient_balance));
+        }
+    }
+
+    /**
+     * Kiểm tra ngân sách hủ nguồn sau khi chuyển tiền.
+     * Chuyển tiền làm giảm số dư hủ nguồn, nên cần kiểm tra xem
+     * hủ nguồn có vượt ngưỡng ngân sách không và gửi System Notification.
+     *
+     * <p>Lưu ý: Không hiện BudgetAlertDialog ở đây vì TransferDialog là DialogFragment
+     * (không phải Activity). Chỉ gửi System Notification.
+     */
+    private void checkBudgetAfterTransfer() {
+        Pot sourcePot = databaseManager.getPotById(selectedSourcePotId);
+        if (sourcePot != null && sourcePot.getBudgetLimit() > 0) {
+            NotificationHelper.checkAndNotifyBudget(
+                    requireContext(),
+                    sourcePot.getId(),
+                    sourcePot.getName(),
+                    sourcePot.getBudgetLimit(),
+                    sourcePot.getBalance()
+            );
         }
     }
 }

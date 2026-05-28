@@ -31,6 +31,7 @@ public class Constants {
     public static final String PREF_IS_PIN_SET = "is_pin_set";
     public static final String PREF_DARK_MODE = "dark_mode";
     public static final String PREF_LANGUAGE = "language";
+    public static final String PREF_NOTIFICATION_ENABLED = "notification_enabled";
 
     // Intent Extras
     public static final String EXTRA_POT_ID = "extra_pot_id";

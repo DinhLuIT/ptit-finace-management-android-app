@@ -82,15 +82,12 @@
         android:clipToPadding="false"
         android:padding="@dimen/spacing_sm" />
 
-    <TextView
-        android:id="@+id/tv_empty"
+    <!-- Empty State (Trạng thái trống cao cấp) -->
+    <include
+        android:id="@+id/include_empty_state"
+        layout="@layout/layout_empty_state"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
-        android:gravity="center"
-        android:text="@string/label_no_transactions"
-        android:textColor="@color/color_text_hint"
-        android:textSize="@dimen/text_body"
-        android:visibility="gone" />
+        android:layout_weight="1" />
 
 </LinearLayout>

@@ -149,4 +149,43 @@
     <string name="label_previous_month">Tháng trước</string>
     <string name="label_next_month">Tháng sau</string>
     <string name="format_month_year" formatted="false">Tháng %02d/%d</string>
+
+    <!-- Notification Channel -->
+    <string name="notification_channel_budget">Cảnh báo ngân sách</string>
+    <string name="notification_channel_budget_desc">Thông báo khi chi tiêu gần đạt hoặc vượt ngân sách hủ</string>
+
+    <!-- Notification Content -->
+    <string name="notification_budget_warning_title">⚠️ Cảnh báo ngân sách</string>
+    <string name="notification_budget_warning_body" formatted="false">Hủ "%s" đã sử dụng %d%% ngân sách. Hãy cân nhắc chi tiêu!</string>
+    <string name="notification_budget_danger_title">🚨 Vượt ngân sách!</string>
+    <string name="notification_budget_danger_body">Hủ \"%s\" đã vượt ngân sách phân bổ. Hãy kiểm tra lại chi tiêu ngay!</string>
+
+    <!-- Budget Alert Dialog -->
+    <string name="alert_budget_warning_title">Gần hết ngân sách!</string>
+    <string name="alert_budget_danger_title">Đã vượt ngân sách!</string>
+    <string name="alert_budget_pot_label">Hủ: %s</string>
+    <string name="alert_budget_warning_message">Bạn đang tiến gần đến giới hạn ngân sách.\nHãy cân nhắc chi tiêu thận trọng hơn nhé! 💡</string>
+    <string name="alert_budget_danger_message">Bạn đã vượt quá ngân sách phân bổ.\nHãy xem xét điều chỉnh kế hoạch chi tiêu! 🔄</string>
+    <string name="btn_understood">Tôi đã hiểu</string>
+
+    <!-- Profile – Notification Toggle -->
+    <string name="label_notification_budget">Cảnh báo ngân sách</string>
+    <string name="label_notification_budget_desc">Nhận thông báo khi hủ gần hết hoặc vượt ngân sách</string>
+
+    <!-- Empty States -->
+    <string name="empty_default_title">Chưa có gì ở đây</string>
+    <string name="empty_default_subtitle">Hãy bắt đầu ngay nào!</string>
+    <string name="empty_pots_title">Chưa có hủ chi tiêu nào</string>
+    <string name="empty_pots_subtitle">Tạo hủ đầu tiên để bắt đầu\nquản lý tài chính thông minh! 🏺</string>
+    <string name="empty_pots_action">Tạo hủ mới</string>
+    <string name="empty_transactions_title">Chưa có giao dịch nào</string>
+    <string name="empty_transactions_subtitle">Các giao dịch thu chi sẽ được\nhiển thị tại đây 📋</string>
+    <string name="empty_home_transactions_title">Chưa có giao dịch gần đây</string>
+    <string name="empty_home_transactions_subtitle">Bắt đầu ghi nhận thu chi\nđể theo dõi tài chính dễ dàng! ✨</string>
+    <string name="empty_statistics_title">Không có dữ liệu chi tiêu</string>
+    <string name="empty_statistics_subtitle">Tháng này chưa phát sinh\nkhoản chi tiêu nào 📊</string>
+    <string name="empty_search_title">Không tìm thấy kết quả</string>
+    <string name="empty_search_subtitle">Thử tìm kiếm với từ khóa khác\nhoặc đặt lại bộ lọc 🔍</string>
+    <string name="btn_add_new">Thêm mới</string>
+    <string name="btn_reset_filter">Đặt lại bộ lọc</string>
 </resources>

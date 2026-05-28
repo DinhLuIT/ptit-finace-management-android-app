@@ -360,4 +360,10 @@ public class StatisticsActivity extends AppCompatActivity {
         buttonNextMonth.setEnabled(canGoNext);
         buttonNextMonth.setAlpha(canGoNext ? 1.0f : 0.3f);
     }
+
+    @Override
+    public void finish() {
+        super.finish();
+        overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
+    }
 }
