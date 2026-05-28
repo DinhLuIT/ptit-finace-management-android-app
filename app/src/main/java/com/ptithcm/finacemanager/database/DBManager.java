@@ -9,6 +9,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import com.ptithcm.finacemanager.model.Category;
 import com.ptithcm.finacemanager.model.Pot;
 import com.ptithcm.finacemanager.model.Transaction;
+import com.ptithcm.finacemanager.BuildConfig;
 import com.ptithcm.finacemanager.utils.Constants;
 import com.ptithcm.finacemanager.utils.DateUtils;
 
@@ -79,7 +80,9 @@ public class DBManager extends SQLiteOpenHelper {
         db.execSQL(CREATE_TABLE_TRANSACTIONS);
         db.execSQL(CREATE_TABLE_USER_SETTINGS);
         seedCategories(db);
-        seedPotsAndTransactions(db);
+        if (BuildConfig.DEBUG) {
+            seedPotsAndTransactions(db);
+        }
     }
 
     @Override
