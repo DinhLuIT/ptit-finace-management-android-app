@@ -190,6 +190,7 @@
     <string name="btn_reset_filter">Reset filter</string>
 
     <!-- Savings Goals -->
+    <string name="label_add_goal_short">Add\ngoal</string>
     <string name="title_add_goal">Add Goal</string>
     <string name="title_edit_goal">Edit Goal</string>
     <string name="label_savings_goal">Savings Goal</string>

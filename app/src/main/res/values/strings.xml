@@ -190,6 +190,7 @@
     <string name="btn_reset_filter">Đặt lại bộ lọc</string>
 
     <!-- Savings Goals -->
+    <string name="label_add_goal_short">Thêm\nmục tiêu</string>
     <string name="title_add_goal">Thêm mục tiêu</string>
     <string name="title_edit_goal">Sửa mục tiêu</string>
     <string name="label_savings_goal">Mục tiêu tiết kiệm</string>

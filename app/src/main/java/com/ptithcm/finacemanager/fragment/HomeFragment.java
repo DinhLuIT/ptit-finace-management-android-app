@@ -20,9 +20,14 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.ptithcm.finacemanager.R;
 import com.ptithcm.finacemanager.activity.AddTransactionActivity;
+import com.ptithcm.finacemanager.activity.GoalDetailActivity;
+import com.ptithcm.finacemanager.activity.SavingsGoalsActivity;
+import com.ptithcm.finacemanager.adapter.HomeGoalAdapter;
 import com.ptithcm.finacemanager.adapter.TransactionAdapter;
 import com.ptithcm.finacemanager.database.DBManager;
+import com.ptithcm.finacemanager.dialog.AddGoalDialog;
 import com.ptithcm.finacemanager.dialog.TransferDialog;
+import com.ptithcm.finacemanager.model.SavingsGoal;
 import com.ptithcm.finacemanager.model.Transaction;
 import com.ptithcm.finacemanager.utils.Constants;
 import com.ptithcm.finacemanager.utils.CurrencyFormatter;
@@ -54,6 +59,13 @@ public class HomeFragment extends Fragment {
     private TransactionAdapter transactionAdapter;
     private List<Transaction> recentTransactions = new ArrayList<>();
 
+    // === Savings Goals Carousel ===
+    private LinearLayout layoutGoalsSection;
+    private RecyclerView recyclerViewHomeGoals;
+    private HomeGoalAdapter homeGoalAdapter;
+    private List<SavingsGoal> savingsGoals = new ArrayList<>();
+    private TextView tvViewAllGoals;
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
@@ -68,6 +80,7 @@ public class HomeFragment extends Fragment {
         initViews(view);
         initListeners();
         setupRecyclerView();
+        setupGoalsCarousel();
     }
 
     @Override
@@ -101,6 +114,11 @@ public class HomeFragment extends Fragment {
         layoutFabAddTransaction = view.findViewById(R.id.layout_fab_add_transaction);
         layoutFabTransfer = view.findViewById(R.id.layout_fab_transfer);
         viewFabOverlay = view.findViewById(R.id.view_fab_overlay);
+
+        // Goals Carousel
+        layoutGoalsSection = view.findViewById(R.id.layout_goals_section);
+        recyclerViewHomeGoals = view.findViewById(R.id.rv_home_goals);
+        tvViewAllGoals = view.findViewById(R.id.tv_view_all_goals);
     }
 
     private void initListeners() {
@@ -131,6 +149,11 @@ public class HomeFragment extends Fragment {
                     bottomNavigationView.setSelectedItemId(R.id.nav_transactions);
                 }
             }
+        });
+
+        // "Xem tất cả" mục tiêu tiết kiệm
+        tvViewAllGoals.setOnClickListener(v -> {
+            startActivity(new Intent(requireContext(), SavingsGoalsActivity.class));
         });
     }
 
@@ -291,5 +314,57 @@ public class HomeFragment extends Fragment {
             emptyStateContainer.setVisibility(View.GONE);
             recyclerViewRecentTransactions.setVisibility(View.VISIBLE);
         }
+
+        // Load Savings Goals carousel
+        loadGoals();
+    }
+
+    // =============================================
+    // ========= SAVINGS GOALS CAROUSEL ============
+    // =============================================
+
+    /**
+     * Cài đặt RecyclerView ngang cho carousel mục tiêu tiết kiệm.
+     */
+    private void setupGoalsCarousel() {
+        homeGoalAdapter = new HomeGoalAdapter(savingsGoals, requireContext());
+        homeGoalAdapter.setOnHomeGoalClickListener(new HomeGoalAdapter.OnHomeGoalClickListener() {
+            @Override
+            public void onGoalClick(SavingsGoal goal) {
+                Intent intent = new Intent(requireContext(), GoalDetailActivity.class);
+                intent.putExtra("extra_goal_id", goal.getId());
+                startActivity(intent);
+            }
+
+            @Override
+            public void onAddGoalClick() {
+                showAddGoalDialog();
+            }
+        });
+
+        recyclerViewHomeGoals.setLayoutManager(
+                new LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false));
+        recyclerViewHomeGoals.setAdapter(homeGoalAdapter);
+    }
+
+    /**
+     * Load danh sách mục tiêu và cập nhật carousel.
+     * Hiện section nếu có ít nhất 1 goal, hoặc luôn hiện nút thêm.
+     */
+    private void loadGoals() {
+        savingsGoals = databaseManager.getAllSavingsGoals();
+        homeGoalAdapter.updateData(savingsGoals);
+
+        // Luôn hiện section (có card "Thêm mục tiêu" dù không có goal nào)
+        layoutGoalsSection.setVisibility(View.VISIBLE);
+    }
+
+    /**
+     * Hiển thị dialog tạo mục tiêu mới từ Home.
+     */
+    private void showAddGoalDialog() {
+        AddGoalDialog dialog = new AddGoalDialog();
+        dialog.setOnGoalSavedListener(this::loadGoals);
+        dialog.show(getParentFragmentManager(), "AddGoalDialog");
     }
 }

@@ -46,6 +46,32 @@ public class CurrencyFormatter {
     }
 
     /**
+     * Format số tiền gọn cho card nhỏ.
+     * Ví dụ: 1,500,000 → "1.5M ₫", 500,000 → "500K ₫", 1,200 → "1,200 ₫"
+     */
+    public static String formatCompact(double amount) {
+        double abs = Math.abs(amount);
+        if (abs >= 1_000_000_000) {
+            return String.format(Locale.US, "%.1fB ₫", amount / 1_000_000_000);
+        } else if (abs >= 1_000_000) {
+            double m = amount / 1_000_000;
+            // Bỏ .0 nếu là số tròn
+            if (m == Math.floor(m)) {
+                return String.format(Locale.US, "%.0fM ₫", m);
+            }
+            return String.format(Locale.US, "%.1fM ₫", m);
+        } else if (abs >= 1_000) {
+            double k = amount / 1_000;
+            if (k == Math.floor(k)) {
+                return String.format(Locale.US, "%.0fK ₫", k);
+            }
+            return String.format(Locale.US, "%.1fK ₫", k);
+        } else {
+            return format(amount);
+        }
+    }
+
+    /**
      * Parse formatted string back to double.
      * Example: "1,500,000" → 1500000.0
      */
