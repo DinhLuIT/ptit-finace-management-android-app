@@ -24,6 +24,12 @@ import com.ptithcm.finacemanager.utils.CurrencyFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Màn hình chi tiết hủ chi tiêu.
+ *
+ * <p>Hiển thị thông tin hủ (tên, số dư, progress ngân sách)
+ * và danh sách giao dịch thuộc hủ đó.
+ */
 public class PotDetailActivity extends AppCompatActivity {
 
     private TextView textViewPotName, textViewBalance, textViewBudgetInfo, textViewEmpty;

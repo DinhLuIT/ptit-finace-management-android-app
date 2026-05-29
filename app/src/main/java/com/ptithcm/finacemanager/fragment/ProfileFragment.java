@@ -14,6 +14,7 @@ import androidx.fragment.app.Fragment;
 
 import com.google.android.material.switchmaterial.SwitchMaterial;
 import com.ptithcm.finacemanager.R;
+import com.ptithcm.finacemanager.activity.SavingsGoalsActivity;
 import com.ptithcm.finacemanager.activity.StatisticsActivity;
 import com.ptithcm.finacemanager.utils.NotificationHelper;
 
@@ -66,6 +67,12 @@ public class ProfileFragment extends Fragment {
         // Mở màn hình Thống kê chi tiêu
         view.findViewById(R.id.tv_statistics).setOnClickListener(v -> {
             Intent intent = new Intent(requireContext(), StatisticsActivity.class);
+            startActivity(intent);
+        });
+
+        // Mở màn hình Mục tiêu tiết kiệm
+        view.findViewById(R.id.tv_savings_goals).setOnClickListener(v -> {
+            Intent intent = new Intent(requireContext(), SavingsGoalsActivity.class);
             startActivity(intent);
         });
 

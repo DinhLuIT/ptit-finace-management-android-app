@@ -188,4 +188,41 @@
     <string name="empty_search_subtitle">Thử tìm kiếm với từ khóa khác\nhoặc đặt lại bộ lọc 🔍</string>
     <string name="btn_add_new">Thêm mới</string>
     <string name="btn_reset_filter">Đặt lại bộ lọc</string>
+
+    <!-- Savings Goals -->
+    <string name="title_add_goal">Thêm mục tiêu</string>
+    <string name="title_edit_goal">Sửa mục tiêu</string>
+    <string name="label_savings_goal">Mục tiêu tiết kiệm</string>
+    <string name="label_goal_subtitle">Đặt mục tiêu để theo dõi tiến độ tiết kiệm</string>
+    <string name="hint_goal_name">Tên mục tiêu (VD: Mua xe máy)</string>
+    <string name="hint_target_amount">Số tiền mục tiêu</string>
+    <string name="hint_target_date">Ngày hoàn thành dự kiến</string>
+    <string name="btn_add_goal">🎯 Thêm mục tiêu tiết kiệm</string>
+    <string name="btn_delete_goal">Xóa mục tiêu</string>
+    <string name="error_goal_name_empty">Vui lòng nhập tên mục tiêu</string>
+    <string name="error_target_amount_invalid">Vui lòng nhập số tiền hợp lệ</string>
+    <string name="error_target_date_empty">Vui lòng chọn ngày hoàn thành</string>
+    <string name="msg_goal_created">Đã tạo mục tiêu! 🎯</string>
+    <string name="msg_goal_updated">Đã cập nhật mục tiêu!</string>
+    <string name="msg_goal_deleted">Đã xóa mục tiêu</string>
+    <string name="msg_confirm_delete_goal">Bạn có chắc muốn xóa mục tiêu tiết kiệm này?</string>
+    <string name="label_days_remaining">Còn %1$d ngày</string>
+    <string name="label_due_today">Đến hạn hôm nay!</string>
+    <string name="label_overdue">Đã quá hạn</string>
+    <string name="label_no_deadline">Không có thời hạn</string>
+    <string name="label_goal_completed">Đã hoàn thành!</string>
+    <string name="label_optional">Không bắt buộc</string>
+    <string name="label_contribute">Đóng góp</string>
+    <string name="label_contribution_history">Lịch sử đóng góp</string>
+    <string name="hint_contribute_amount">Số tiền đóng góp</string>
+    <string name="msg_contributed_success">Đã đóng góp thành công! 💰</string>
+    <string name="msg_contribution_deleted">Đã xóa đóng góp</string>
+    <string name="msg_confirm_delete_contribution">Bạn có chắc muốn xóa khoản đóng góp này?</string>
+    <string name="label_remaining_amount">Còn thiếu</string>
+    <string name="empty_goals_title">Chưa có mục tiêu nào</string>
+    <string name="empty_goals_subtitle">Đặt mục tiêu tiết kiệm\nđể theo dõi hành trình tài chính! 🎯</string>
+    <string name="empty_contributions_title">Chưa có đóng góp nào</string>
+    <string name="empty_contributions_subtitle">Nhấn nút bên dưới để bắt đầu\ntiết kiệm cho mục tiêu này! 💪</string>
+    <string name="error_contribute_amount_invalid">Vui lòng nhập số tiền hợp lệ</string>
+
 </resources>

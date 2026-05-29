@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:paddingHorizontal="@dimen/spacing_md"
+    android:paddingVertical="@dimen/spacing_sm"
+    android:background="?attr/selectableItemBackground">
+
+    <!-- Icon tròn xanh lá với dấu "+" -->
+    <FrameLayout
+        android:layout_width="@dimen/item_icon_size"
+        android:layout_height="@dimen/item_icon_size">
+
+        <View
+            android:id="@+id/view_contribution_bg"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/bg_circle" />
+
+        <TextView
+            android:id="@+id/tv_contribution_icon"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text="+"
+            android:textColor="@color/white"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+    </FrameLayout>
+
+    <!-- Thông tin: Số tiền + Ghi chú -->
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/spacing_sm"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tv_contribution_amount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/color_income"
+            android:textSize="@dimen/text_body"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tv_contribution_note"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textColor="@color/color_text_secondary"
+            android:textSize="@dimen/text_caption" />
+    </LinearLayout>
+
+    <!-- Ngày đóng góp -->
+    <TextView
+        android:id="@+id/tv_contribution_date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/color_text_secondary"
+        android:textSize="@dimen/text_caption" />
+
+</LinearLayout>

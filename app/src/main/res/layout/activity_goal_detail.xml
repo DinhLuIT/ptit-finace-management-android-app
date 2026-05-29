@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    android:background="@color/color_background">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <!-- Toolbar: Back + Icon/Name + Edit/Delete -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:padding="@dimen/spacing_md">
+
+            <ImageView
+                android:id="@+id/iv_back"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/btn_cancel"
+                android:padding="@dimen/spacing_sm"
+                android:src="@drawable/ic_back" />
+
+            <!-- Emoji icon của mục tiêu -->
+            <TextView
+                android:id="@+id/tv_goal_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/spacing_sm"
+                android:textSize="24sp" />
+
+            <TextView
+                android:id="@+id/tv_goal_name"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/spacing_sm"
+                android:layout_weight="1"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:textColor="@color/color_text_primary"
+                android:textSize="@dimen/text_title"
+                android:textStyle="bold" />
+
+            <ImageView
+                android:id="@+id/iv_edit"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/title_edit_goal"
+                android:padding="@dimen/spacing_sm"
+                android:src="@drawable/ic_edit" />
+
+            <ImageView
+                android:id="@+id/iv_delete"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/btn_delete"
+                android:padding="@dimen/spacing_sm"
+                android:src="@drawable/ic_delete" />
+        </LinearLayout>
+
+        <!-- Nội dung cuộn được -->
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:fillViewport="true">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingBottom="@dimen/spacing_lg">
+
+                <!-- ========== PROGRESS CARD ========== -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/card_progress"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="@dimen/spacing_md"
+                    app:cardCornerRadius="@dimen/card_radius"
+                    app:cardElevation="@dimen/card_elevation"
+                    app:cardBackgroundColor="@color/color_primary">
+
+                    <LinearLayout
+                        android:id="@+id/ll_progress_container"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="@dimen/spacing_lg">
+
+                        <!-- Phần trăm lớn -->
+                        <TextView
+                            android:id="@+id/tv_percentage"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:textColor="@color/white"
+                            android:textSize="48sp"
+                            android:textStyle="bold" />
+
+                        <!-- Progress Bar -->
+                        <ProgressBar
+                            android:id="@+id/pb_goal_progress"
+                            style="?android:attr/progressBarStyleHorizontal"
+                            android:layout_width="match_parent"
+                            android:layout_height="12dp"
+                            android:layout_marginTop="@dimen/spacing_md"
+                            android:max="100"
+                            android:progressDrawable="@drawable/bg_progress_bar_goal" />
+
+                        <!-- Current / Target amounts -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/spacing_sm"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/label_balance"
+                                    android:textColor="#B3FFFFFF"
+                                    android:textSize="@dimen/text_caption" />
+
+                                <TextView
+                                    android:id="@+id/tv_current_amount"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:textColor="@color/white"
+                                    android:textSize="@dimen/text_subtitle"
+                                    android:textStyle="bold" />
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:gravity="end"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/label_savings_goal"
+                                    android:textColor="#B3FFFFFF"
+                                    android:textSize="@dimen/text_caption" />
+
+                                <TextView
+                                    android:id="@+id/tv_target_amount"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:textColor="@color/white"
+                                    android:textSize="@dimen/text_subtitle"
+                                    android:textStyle="bold" />
+                            </LinearLayout>
+                        </LinearLayout>
+
+                        <!-- Còn thiếu + Ngày còn lại -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/spacing_sm"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <!-- TODO: Thêm string resource "Còn thiếu" -->
+                            <TextView
+                                android:id="@+id/tv_remaining_amount"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:textColor="#B3FFFFFF"
+                                android:textSize="@dimen/text_caption" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="📅"
+                                android:textSize="14sp" />
+
+                            <TextView
+                                android:id="@+id/tv_days_remaining"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="4dp"
+                                android:textColor="#B3FFFFFF"
+                                android:textSize="@dimen/text_caption" />
+                        </LinearLayout>
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- ========== NÚT ĐÓNG GÓP ========== -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_contribute"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/button_height"
+                    android:layout_marginHorizontal="@dimen/spacing_md"
+                    android:layout_marginTop="@dimen/spacing_md"
+                    android:backgroundTint="@color/color_primary"
+                    android:text="@string/label_contribute"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/text_subtitle"
+                    android:textStyle="bold"
+                    app:cornerRadius="@dimen/button_radius"
+                    app:icon="@drawable/ic_add"
+                    app:iconGravity="textStart"
+                    app:iconTint="@color/white" />
+
+                <!-- ========== HEADER LỊCH SỬ ĐÓNG GÓP ========== -->
+                <!-- TODO: Thêm string resource "Lịch sử đóng góp" -->
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="@dimen/spacing_md"
+                    android:text="@string/label_contribution_history"
+                    android:textColor="@color/color_text_primary"
+                    android:textSize="@dimen/text_subtitle"
+                    android:textStyle="bold" />
+
+                <!-- ========== DANH SÁCH ĐÓNG GÓP ========== -->
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rv_contributions"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:clipToPadding="false"
+                    android:nestedScrollingEnabled="false" />
+
+                <!-- ========== TRẠNG THÁI TRỐNG ========== -->
+                <TextView
+                    android:id="@+id/tv_empty"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:padding="@dimen/spacing_xxl"
+                    android:text="@string/empty_contributions_subtitle"
+                    android:textColor="@color/color_text_hint"
+                    android:textSize="@dimen/text_body"
+                    android:visibility="gone" />
+
+            </LinearLayout>
+        </ScrollView>
+    </LinearLayout>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

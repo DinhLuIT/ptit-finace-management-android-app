@@ -49,6 +49,22 @@
                     android:background="@color/color_divider" />
 
                 <TextView
+                    android:id="@+id/tv_savings_goals"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/item_min_height"
+                    android:gravity="center_vertical"
+                    android:paddingHorizontal="@dimen/spacing_md"
+                    android:text="@string/label_savings_goal"
+                    android:textColor="@color/color_text_primary"
+                    android:textSize="@dimen/text_subtitle"
+                    android:background="?attr/selectableItemBackground" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/color_divider" />
+
+                <TextView
                     android:id="@+id/tv_exchange_rate"
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/item_min_height"

@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_dialog_rounded"
+        android:orientation="vertical"
+        android:padding="24dp">
+
+        <!-- Header -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:layout_marginBottom="16dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="💰"
+                android:textSize="48sp" />
+
+            <!-- TODO: Thêm string resource "Đóng góp" -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="Đóng góp"
+                android:textColor="@color/color_text_primary"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <!-- Hiển thị số tiền còn thiếu -->
+            <!-- TODO: Thêm string resource "Còn thiếu: %s" -->
+            <TextView
+                android:id="@+id/tv_remaining_info"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:gravity="center"
+                android:textColor="@color/color_text_secondary"
+                android:textSize="13sp" />
+        </LinearLayout>
+
+        <!-- Số tiền đóng góp -->
+        <!-- TODO: Thêm string resource "Số tiền đóng góp" -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/til_contribute_amount"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            app:suffixText="₫">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/et_contribute_amount"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Số tiền đóng góp"
+                android:inputType="numberDecimal"
+                android:maxLines="1" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Ghi chú (tùy chọn) -->
+        <!-- TODO: Thêm string resource "Ghi chú (tùy chọn)" -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/til_contribute_note"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/et_contribute_note"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Ghi chú (tùy chọn)"
+                android:inputType="text"
+                android:maxLines="1" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Buttons -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="end">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_cancel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/btn_cancel"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:textColor="@color/color_text_secondary" />
+
+            <!-- TODO: Thêm string resource "Đóng góp" -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_contribute"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:text="Đóng góp"
+                android:backgroundTint="@color/color_primary" />
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>

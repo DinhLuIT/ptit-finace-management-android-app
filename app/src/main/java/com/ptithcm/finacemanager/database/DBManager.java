@@ -8,7 +8,10 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 import com.ptithcm.finacemanager.model.Category;
 import com.ptithcm.finacemanager.model.CategoryExpense;
+import com.ptithcm.finacemanager.model.GoalContribution;
 import com.ptithcm.finacemanager.model.Pot;
+import com.ptithcm.finacemanager.model.RecurringTransaction;
+import com.ptithcm.finacemanager.model.SavingsGoal;
 import com.ptithcm.finacemanager.model.Transaction;
 import com.ptithcm.finacemanager.BuildConfig;
 import com.ptithcm.finacemanager.utils.Constants;
@@ -62,6 +65,45 @@ public class DBManager extends SQLiteOpenHelper {
                     "DARK_MODE INTEGER DEFAULT 0, " +
                     "NOTIFICATION_ENABLED INTEGER DEFAULT 1)";
 
+    // === Phase 3: Bảng mục tiêu tiết kiệm (Phương Án A – Độc lập) ===
+    private static final String CREATE_TABLE_SAVINGS_GOALS =
+            "CREATE TABLE " + Constants.TABLE_SAVINGS_GOALS + " (" +
+                    "ID INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    "NAME TEXT NOT NULL, " +
+                    "TARGET_AMOUNT REAL NOT NULL, " +
+                    "CURRENT_AMOUNT REAL DEFAULT 0, " +
+                    "TARGET_DATE TEXT, " +
+                    "ICON TEXT DEFAULT '🎯', " +
+                    "COLOR TEXT DEFAULT '#4CAF50', " +
+                    "CREATED_AT TEXT NOT NULL)";
+
+    // === Phase 3: Bảng lịch sử đóng góp vào mục tiêu ===
+    private static final String CREATE_TABLE_GOAL_CONTRIBUTIONS =
+            "CREATE TABLE " + Constants.TABLE_GOAL_CONTRIBUTIONS + " (" +
+                    "ID INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    "GOAL_ID INTEGER NOT NULL, " +
+                    "AMOUNT REAL NOT NULL, " +
+                    "NOTE TEXT, " +
+                    "DATE TEXT NOT NULL, " +
+                    "CREATED_AT TEXT NOT NULL, " +
+                    "FOREIGN KEY(GOAL_ID) REFERENCES SAVINGS_GOALS(ID))";
+
+    // === Phase 3: Bảng giao dịch định kỳ ===
+    private static final String CREATE_TABLE_RECURRING_TRANSACTIONS =
+            "CREATE TABLE " + Constants.TABLE_RECURRING_TRANSACTIONS + " (" +
+                    "ID INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    "POT_ID INTEGER NOT NULL, " +
+                    "CATEGORY_ID INTEGER, " +
+                    "AMOUNT REAL NOT NULL, " +
+                    "TYPE TEXT NOT NULL, " +
+                    "NOTE TEXT, " +
+                    "FREQUENCY TEXT NOT NULL, " +
+                    "NEXT_DATE TEXT NOT NULL, " +
+                    "IS_ACTIVE INTEGER DEFAULT 1, " +
+                    "CREATED_AT TEXT NOT NULL, " +
+                    "FOREIGN KEY(POT_ID) REFERENCES POTS(ID), " +
+                    "FOREIGN KEY(CATEGORY_ID) REFERENCES CATEGORIES(ID))";
+
     // Singleton pattern
     public static synchronized DBManager getInstance(Context context) {
         if (instance == null) {
@@ -80,6 +122,9 @@ public class DBManager extends SQLiteOpenHelper {
         db.execSQL(CREATE_TABLE_CATEGORIES);
         db.execSQL(CREATE_TABLE_TRANSACTIONS);
         db.execSQL(CREATE_TABLE_USER_SETTINGS);
+        db.execSQL(CREATE_TABLE_SAVINGS_GOALS);
+        db.execSQL(CREATE_TABLE_GOAL_CONTRIBUTIONS);
+        db.execSQL(CREATE_TABLE_RECURRING_TRANSACTIONS);
         seedCategories(db);
         if (BuildConfig.DEBUG) {
             seedPotsAndTransactions(db);
@@ -88,12 +133,35 @@ public class DBManager extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        // Trong giai đoạn dev, drop và tạo lại
-        db.execSQL("DROP TABLE IF EXISTS " + Constants.TABLE_TRANSACTIONS);
-        db.execSQL("DROP TABLE IF EXISTS " + Constants.TABLE_CATEGORIES);
-        db.execSQL("DROP TABLE IF EXISTS " + Constants.TABLE_POTS);
-        db.execSQL("DROP TABLE IF EXISTS " + Constants.TABLE_USER_SETTINGS);
-        onCreate(db);
+        // Migration an toàn: chỉ thêm bảng mới, không xóa dữ liệu cũ
+        if (oldVersion < 5) {
+            // Phase 3 v1: Tạo bảng RECURRING_TRANSACTIONS
+            db.execSQL("CREATE TABLE IF NOT EXISTS " + Constants.TABLE_RECURRING_TRANSACTIONS + " (" +
+                    "ID INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    "POT_ID INTEGER NOT NULL, " +
+                    "CATEGORY_ID INTEGER, " +
+                    "AMOUNT REAL NOT NULL, " +
+                    "TYPE TEXT NOT NULL, " +
+                    "NOTE TEXT, " +
+                    "FREQUENCY TEXT NOT NULL, " +
+                    "NEXT_DATE TEXT NOT NULL, " +
+                    "IS_ACTIVE INTEGER DEFAULT 1, " +
+                    "CREATED_AT TEXT NOT NULL, " +
+                    "FOREIGN KEY(POT_ID) REFERENCES POTS(ID), " +
+                    "FOREIGN KEY(CATEGORY_ID) REFERENCES CATEGORIES(ID))");
+        }
+
+        if (oldVersion < 6) {
+            // Phase 3 v2 (Plan A): Redesign SAVINGS_GOALS – độc lập, không gắn Pot
+            // Drop bảng cũ (nếu có – schema cũ có POT_ID, thiếu CURRENT_AMOUNT/ICON/COLOR)
+            db.execSQL("DROP TABLE IF EXISTS " + Constants.TABLE_SAVINGS_GOALS);
+
+            // Tạo bảng SAVINGS_GOALS mới (Plan A – không POT_ID)
+            db.execSQL(CREATE_TABLE_SAVINGS_GOALS);
+
+            // Tạo bảng GOAL_CONTRIBUTIONS
+            db.execSQL(CREATE_TABLE_GOAL_CONTRIBUTIONS);
+        }
     }
 
     @Override
@@ -938,5 +1006,370 @@ public class DBManager extends SQLiteOpenHelper {
             database.close();
         }
         return latestDate;
+    }
+
+    // =============================================
+    // ========= SAVINGS GOAL METHODS =============
+    // =============================================
+
+    /**
+     * Thêm mục tiêu tiết kiệm mới (độc lập, không gắn Pot).
+     *
+     * @param goal Đối tượng SavingsGoal cần lưu
+     * @return ID của mục tiêu vừa tạo
+     */
+    public long addSavingsGoal(SavingsGoal goal) {
+        SQLiteDatabase db = getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("NAME", goal.getName());
+        values.put("TARGET_AMOUNT", goal.getTargetAmount());
+        values.put("CURRENT_AMOUNT", goal.getCurrentAmount());
+        values.put("TARGET_DATE", goal.getTargetDate());
+        values.put("ICON", goal.getIcon());
+        values.put("COLOR", goal.getColor());
+        values.put("CREATED_AT", DateUtils.getNowDB());
+
+        long id = db.insert(Constants.TABLE_SAVINGS_GOALS, null, values);
+        db.close();
+        return id;
+    }
+
+    /**
+     * Lấy tất cả mục tiêu tiết kiệm, sắp xếp theo ngày tạo (mới nhất trước).
+     */
+    public List<SavingsGoal> getAllSavingsGoals() {
+        List<SavingsGoal> list = new ArrayList<>();
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor cursor = db.query(Constants.TABLE_SAVINGS_GOALS, null, null, null,
+                null, null, "CREATED_AT DESC");
+        try {
+            if (cursor.moveToFirst()) {
+                do {
+                    list.add(cursorToSavingsGoal(cursor));
+                } while (cursor.moveToNext());
+            }
+        } finally {
+            cursor.close();
+            db.close();
+        }
+        return list;
+    }
+
+    /**
+     * Lấy mục tiêu tiết kiệm theo ID.
+     */
+    public SavingsGoal getSavingsGoalById(int goalId) {
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor cursor = db.query(Constants.TABLE_SAVINGS_GOALS, null,
+                "ID = ?", new String[]{String.valueOf(goalId)},
+                null, null, null);
+        SavingsGoal goal = null;
+        try {
+            if (cursor.moveToFirst()) {
+                goal = cursorToSavingsGoal(cursor);
+            }
+        } finally {
+            cursor.close();
+            db.close();
+        }
+        return goal;
+    }
+
+    /**
+     * Cập nhật thông tin mục tiêu tiết kiệm.
+     */
+    public void updateSavingsGoal(SavingsGoal goal) {
+        SQLiteDatabase db = getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("NAME", goal.getName());
+        values.put("TARGET_AMOUNT", goal.getTargetAmount());
+        values.put("TARGET_DATE", goal.getTargetDate());
+        values.put("ICON", goal.getIcon());
+        values.put("COLOR", goal.getColor());
+        db.update(Constants.TABLE_SAVINGS_GOALS, values,
+                "ID = ?", new String[]{String.valueOf(goal.getId())});
+        db.close();
+    }
+
+    /**
+     * Xóa mục tiêu tiết kiệm và tất cả lịch sử đóng góp của nó.
+     */
+    public void deleteSavingsGoal(int goalId) {
+        SQLiteDatabase db = getWritableDatabase();
+        db.beginTransaction();
+        try {
+            // Xóa lịch sử đóng góp trước (foreign key)
+            db.delete(Constants.TABLE_GOAL_CONTRIBUTIONS, "GOAL_ID = ?",
+                    new String[]{String.valueOf(goalId)});
+            // Xóa mục tiêu
+            db.delete(Constants.TABLE_SAVINGS_GOALS, "ID = ?",
+                    new String[]{String.valueOf(goalId)});
+            db.setTransactionSuccessful();
+        } finally {
+            db.endTransaction();
+            db.close();
+        }
+    }
+
+    private SavingsGoal cursorToSavingsGoal(Cursor cursor) {
+        SavingsGoal goal = new SavingsGoal();
+        goal.setId(cursor.getInt(cursor.getColumnIndexOrThrow("ID")));
+        goal.setName(cursor.getString(cursor.getColumnIndexOrThrow("NAME")));
+        goal.setTargetAmount(cursor.getDouble(cursor.getColumnIndexOrThrow("TARGET_AMOUNT")));
+        goal.setCurrentAmount(cursor.getDouble(cursor.getColumnIndexOrThrow("CURRENT_AMOUNT")));
+        goal.setTargetDate(cursor.getString(cursor.getColumnIndexOrThrow("TARGET_DATE")));
+        goal.setIcon(cursor.getString(cursor.getColumnIndexOrThrow("ICON")));
+        goal.setColor(cursor.getString(cursor.getColumnIndexOrThrow("COLOR")));
+        goal.setCreatedAt(cursor.getString(cursor.getColumnIndexOrThrow("CREATED_AT")));
+        return goal;
+    }
+
+    // =============================================
+    // ======= GOAL CONTRIBUTION METHODS ===========
+    // =============================================
+
+    /**
+     * Đóng góp tiền vào mục tiêu tiết kiệm.
+     * Sử dụng SQLite transaction để đảm bảo tính toàn vẹn:
+     * 1. Thêm bản ghi đóng góp vào GOAL_CONTRIBUTIONS
+     * 2. Cộng số tiền vào CURRENT_AMOUNT của SAVINGS_GOALS
+     *
+     * @param contribution Đối tượng GoalContribution
+     * @return ID của bản ghi đóng góp
+     */
+    public long addGoalContribution(GoalContribution contribution) {
+        SQLiteDatabase db = getWritableDatabase();
+        db.beginTransaction();
+        long id = -1;
+        try {
+            // 1. Thêm bản ghi đóng góp
+            ContentValues values = new ContentValues();
+            values.put("GOAL_ID", contribution.getGoalId());
+            values.put("AMOUNT", contribution.getAmount());
+            values.put("NOTE", contribution.getNote());
+            values.put("DATE", contribution.getDate());
+            values.put("CREATED_AT", DateUtils.getNowDB());
+            id = db.insert(Constants.TABLE_GOAL_CONTRIBUTIONS, null, values);
+
+            // 2. Cộng vào CURRENT_AMOUNT
+            db.execSQL("UPDATE " + Constants.TABLE_SAVINGS_GOALS +
+                            " SET CURRENT_AMOUNT = CURRENT_AMOUNT + ? WHERE ID = ?",
+                    new Object[]{contribution.getAmount(), contribution.getGoalId()});
+
+            db.setTransactionSuccessful();
+        } finally {
+            db.endTransaction();
+            db.close();
+        }
+        return id;
+    }
+
+    /**
+     * Lấy lịch sử đóng góp cho một mục tiêu, mới nhất trước.
+     */
+    public List<GoalContribution> getContributionsByGoalId(int goalId) {
+        List<GoalContribution> list = new ArrayList<>();
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor cursor = db.query(Constants.TABLE_GOAL_CONTRIBUTIONS, null,
+                "GOAL_ID = ?", new String[]{String.valueOf(goalId)},
+                null, null, "DATE DESC, CREATED_AT DESC");
+        try {
+            if (cursor.moveToFirst()) {
+                do {
+                    list.add(cursorToGoalContribution(cursor));
+                } while (cursor.moveToNext());
+            }
+        } finally {
+            cursor.close();
+            db.close();
+        }
+        return list;
+    }
+
+    /**
+     * Xóa một bản ghi đóng góp và trừ lại CURRENT_AMOUNT.
+     */
+    public void deleteGoalContribution(int contributionId, int goalId, double amount) {
+        SQLiteDatabase db = getWritableDatabase();
+        db.beginTransaction();
+        try {
+            db.delete(Constants.TABLE_GOAL_CONTRIBUTIONS, "ID = ?",
+                    new String[]{String.valueOf(contributionId)});
+
+            db.execSQL("UPDATE " + Constants.TABLE_SAVINGS_GOALS +
+                            " SET CURRENT_AMOUNT = MAX(0, CURRENT_AMOUNT - ?) WHERE ID = ?",
+                    new Object[]{amount, goalId});
+
+            db.setTransactionSuccessful();
+        } finally {
+            db.endTransaction();
+            db.close();
+        }
+    }
+
+    private GoalContribution cursorToGoalContribution(Cursor cursor) {
+        GoalContribution c = new GoalContribution();
+        c.setId(cursor.getInt(cursor.getColumnIndexOrThrow("ID")));
+        c.setGoalId(cursor.getInt(cursor.getColumnIndexOrThrow("GOAL_ID")));
+        c.setAmount(cursor.getDouble(cursor.getColumnIndexOrThrow("AMOUNT")));
+        c.setNote(cursor.getString(cursor.getColumnIndexOrThrow("NOTE")));
+        c.setDate(cursor.getString(cursor.getColumnIndexOrThrow("DATE")));
+        c.setCreatedAt(cursor.getString(cursor.getColumnIndexOrThrow("CREATED_AT")));
+        return c;
+    }
+
+    // =============================================
+    // ===== RECURRING TRANSACTION METHODS =========
+    // =============================================
+
+    /**
+     * Thêm giao dịch định kỳ mới.
+     *
+     * @param recurring Đối tượng RecurringTransaction
+     * @return ID của giao dịch định kỳ vừa tạo
+     */
+    public long addRecurringTransaction(RecurringTransaction recurring) {
+        SQLiteDatabase db = getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("POT_ID", recurring.getPotId());
+        values.put("CATEGORY_ID", recurring.getCategoryId());
+        values.put("AMOUNT", recurring.getAmount());
+        values.put("TYPE", recurring.getType());
+        values.put("NOTE", recurring.getNote());
+        values.put("FREQUENCY", recurring.getFrequency());
+        values.put("NEXT_DATE", recurring.getNextDate());
+        values.put("IS_ACTIVE", recurring.isActive() ? 1 : 0);
+        values.put("CREATED_AT", DateUtils.getNowDB());
+
+        long id = db.insert(Constants.TABLE_RECURRING_TRANSACTIONS, null, values);
+        db.close();
+        return id;
+    }
+
+    /**
+     * Lấy tất cả giao dịch định kỳ đang hoạt động, kèm thông tin Pot và Category.
+     */
+    public List<RecurringTransaction> getAllActiveRecurringTransactions() {
+        List<RecurringTransaction> list = new ArrayList<>();
+        SQLiteDatabase db = getReadableDatabase();
+        String query = "SELECT R.*, P.NAME AS POT_NAME, C.NAME AS CAT_NAME, C.ICON AS CAT_ICON " +
+                "FROM " + Constants.TABLE_RECURRING_TRANSACTIONS + " R " +
+                "LEFT JOIN " + Constants.TABLE_POTS + " P ON R.POT_ID = P.ID " +
+                "LEFT JOIN " + Constants.TABLE_CATEGORIES + " C ON R.CATEGORY_ID = C.ID " +
+                "WHERE R.IS_ACTIVE = 1 " +
+                "ORDER BY R.NEXT_DATE ASC";
+        Cursor cursor = db.rawQuery(query, null);
+        try {
+            if (cursor.moveToFirst()) {
+                do {
+                    list.add(cursorToRecurringTransaction(cursor));
+                } while (cursor.moveToNext());
+            }
+        } finally {
+            cursor.close();
+            db.close();
+        }
+        return list;
+    }
+
+    /**
+     * Lấy các giao dịch định kỳ đến hạn (NEXT_DATE <= today).
+     * Được gọi bởi RecurringTransactionWorker hàng ngày.
+     *
+     * @param todayDate Ngày hôm nay (yyyy-MM-dd)
+     * @return Danh sách giao dịch cần được thực hiện
+     */
+    public List<RecurringTransaction> getDueRecurringTransactions(String todayDate) {
+        List<RecurringTransaction> list = new ArrayList<>();
+        SQLiteDatabase db = getReadableDatabase();
+        String query = "SELECT R.*, P.NAME AS POT_NAME, C.NAME AS CAT_NAME, C.ICON AS CAT_ICON " +
+                "FROM " + Constants.TABLE_RECURRING_TRANSACTIONS + " R " +
+                "LEFT JOIN " + Constants.TABLE_POTS + " P ON R.POT_ID = P.ID " +
+                "LEFT JOIN " + Constants.TABLE_CATEGORIES + " C ON R.CATEGORY_ID = C.ID " +
+                "WHERE R.IS_ACTIVE = 1 AND R.NEXT_DATE <= ? " +
+                "ORDER BY R.NEXT_DATE ASC";
+        Cursor cursor = db.rawQuery(query, new String[]{todayDate});
+        try {
+            if (cursor.moveToFirst()) {
+                do {
+                    list.add(cursorToRecurringTransaction(cursor));
+                } while (cursor.moveToNext());
+            }
+        } finally {
+            cursor.close();
+            db.close();
+        }
+        return list;
+    }
+
+    /**
+     * Cập nhật ngày lặp tiếp theo cho giao dịch định kỳ.
+     *
+     * @param recurringId ID giao dịch định kỳ
+     * @param nextDate    Ngày lặp tiếp theo (yyyy-MM-dd)
+     */
+    public void updateRecurringNextDate(int recurringId, String nextDate) {
+        SQLiteDatabase db = getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("NEXT_DATE", nextDate);
+        db.update(Constants.TABLE_RECURRING_TRANSACTIONS, values,
+                "ID = ?", new String[]{String.valueOf(recurringId)});
+        db.close();
+    }
+
+    /**
+     * Dừng (deactivate) giao dịch định kỳ thay vì xóa hẳn.
+     */
+    public void deactivateRecurringTransaction(int recurringId) {
+        SQLiteDatabase db = getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("IS_ACTIVE", 0);
+        db.update(Constants.TABLE_RECURRING_TRANSACTIONS, values,
+                "ID = ?", new String[]{String.valueOf(recurringId)});
+        db.close();
+    }
+
+    /**
+     * Xóa vĩnh viễn giao dịch định kỳ.
+     */
+    public void deleteRecurringTransaction(int recurringId) {
+        SQLiteDatabase db = getWritableDatabase();
+        db.delete(Constants.TABLE_RECURRING_TRANSACTIONS, "ID = ?",
+                new String[]{String.valueOf(recurringId)});
+        db.close();
+    }
+
+    private RecurringTransaction cursorToRecurringTransaction(Cursor cursor) {
+        RecurringTransaction recurring = new RecurringTransaction();
+        recurring.setId(cursor.getInt(cursor.getColumnIndexOrThrow("ID")));
+        recurring.setPotId(cursor.getInt(cursor.getColumnIndexOrThrow("POT_ID")));
+        recurring.setAmount(cursor.getDouble(cursor.getColumnIndexOrThrow("AMOUNT")));
+        recurring.setType(cursor.getString(cursor.getColumnIndexOrThrow("TYPE")));
+        recurring.setNote(cursor.getString(cursor.getColumnIndexOrThrow("NOTE")));
+        recurring.setFrequency(cursor.getString(cursor.getColumnIndexOrThrow("FREQUENCY")));
+        recurring.setNextDate(cursor.getString(cursor.getColumnIndexOrThrow("NEXT_DATE")));
+        recurring.setActive(cursor.getInt(cursor.getColumnIndexOrThrow("IS_ACTIVE")) == 1);
+        recurring.setCreatedAt(cursor.getString(cursor.getColumnIndexOrThrow("CREATED_AT")));
+
+        // Category ID có thể null
+        int catIdIndex = cursor.getColumnIndex("CATEGORY_ID");
+        if (catIdIndex >= 0 && !cursor.isNull(catIdIndex)) {
+            recurring.setCategoryId(cursor.getInt(catIdIndex));
+        }
+
+        // Transient fields từ JOIN
+        int potNameIndex = cursor.getColumnIndex("POT_NAME");
+        if (potNameIndex >= 0) {
+            recurring.setPotName(cursor.getString(potNameIndex));
+        }
+        int catNameIndex = cursor.getColumnIndex("CAT_NAME");
+        if (catNameIndex >= 0) {
+            recurring.setCategoryName(cursor.getString(catNameIndex));
+        }
+        int catIconIndex = cursor.getColumnIndex("CAT_ICON");
+        if (catIconIndex >= 0) {
+            recurring.setCategoryIcon(cursor.getString(catIconIndex));
+        }
+        return recurring;
     }
 }
