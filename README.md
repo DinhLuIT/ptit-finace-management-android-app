@@ -354,7 +354,9 @@ try {
 |---|---|
 | **Actor** | Người dùng |
 | **Mô tả** | Xuất dữ liệu chi tiêu ra file CSV |
-| **Flow chính** | 1. Profile → Xuất báo cáo<br>2. Chọn khoảng thời gian<br>3. Tạo file CSV<br>4. Share intent → Email, Messaging |
+| **Flow chính** | 1. Profile → Xuất báo cáo<br>2. Hiển thị Loading Dialog<br>3. Tạo file CSV (UTF-8 + BOM) chạy ngầm<br>4. Mở Share Sheet → Zalo, Email, Google Drive… |
+| **Tên file** | `BaoCao_TaiChinh_YYYY-MM-DD_HHmmss.csv` |
+| **Cột CSV** | STT, Ngày, Loại, Hủ quỹ, Danh mục, Số tiền, Ghi chú |
 
 ### 🎯 UC-10: Mục Tiêu Tiết Kiệm
 | | |

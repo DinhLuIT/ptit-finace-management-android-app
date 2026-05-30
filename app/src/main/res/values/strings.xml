@@ -265,4 +265,10 @@
     <string name="error_no_connection_desc">Vui lòng kiểm tra kết nối Internet\nvà thử lại</string>
     <string name="msg_same_currency">Vui lòng chọn 2 loại tiền tệ khác nhau</string>
 
+    <!-- CSV Export -->
+    <string name="msg_exporting">Đang xuất báo cáo…</string>
+    <string name="export_subject">Báo cáo Tài chính – Finance Manager</string>
+    <string name="export_chooser_title">Chia sẻ báo cáo qua</string>
+    <string name="msg_export_empty">Không có giao dịch nào để xuất</string>
+
 </resources>

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths>
+    <!-- Thư mục cache nội bộ để lưu tạm file CSV trước khi share -->
+    <cache-path
+        name="csv_reports"
+        path="reports/" />
+</paths>

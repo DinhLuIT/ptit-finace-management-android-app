@@ -265,4 +265,10 @@
     <string name="error_no_connection_desc">Please check your connection\nand try again</string>
     <string name="msg_same_currency">Please select 2 different currencies</string>
 
+    <!-- CSV Export -->
+    <string name="msg_exporting">Exporting report…</string>
+    <string name="export_subject">Finance Report – Finance Manager</string>
+    <string name="export_chooser_title">Share report via</string>
+    <string name="msg_export_empty">No transactions to export</string>
+
 </resources>

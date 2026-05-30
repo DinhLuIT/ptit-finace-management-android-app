@@ -1,6 +1,8 @@
 package com.ptithcm.finacemanager.fragment;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,6 +20,7 @@ import com.ptithcm.finacemanager.R;
 import com.ptithcm.finacemanager.activity.ExchangeRateActivity;
 import com.ptithcm.finacemanager.activity.SavingsGoalsActivity;
 import com.ptithcm.finacemanager.activity.StatisticsActivity;
+import com.ptithcm.finacemanager.utils.CSVExportHelper;
 import com.ptithcm.finacemanager.utils.NotificationHelper;
 
 public class ProfileFragment extends Fragment {
@@ -101,9 +104,7 @@ public class ProfileFragment extends Fragment {
             startActivity(intent);
         });
 
-        view.findViewById(R.id.tv_export).setOnClickListener(v -> {
-            Toast.makeText(requireContext(), "Coming in Phase 3", Toast.LENGTH_SHORT).show();
-        });
+        view.findViewById(R.id.tv_export).setOnClickListener(v -> exportCSV());
 
         view.findViewById(R.id.tv_change_pin).setOnClickListener(v -> {
             Toast.makeText(requireContext(), "Coming soon", Toast.LENGTH_SHORT).show();
@@ -111,6 +112,37 @@ public class ProfileFragment extends Fragment {
 
         view.findViewById(R.id.tv_about).setOnClickListener(v -> {
             Toast.makeText(requireContext(), "Finance Manager v1.0\nPTIT HCM", Toast.LENGTH_LONG).show();
+        });
+    }
+
+    /**
+     * Xuất báo cáo CSV và mở Share Sheet.
+     */
+    private void exportCSV() {
+        ProgressDialog progressDialog = new ProgressDialog(requireContext());
+        progressDialog.setMessage(getString(R.string.msg_exporting));
+        progressDialog.setCancelable(false);
+        progressDialog.show();
+
+        CSVExportHelper.exportAllTransactions(requireContext(), new CSVExportHelper.ExportCallback() {
+            @Override
+            public void onSuccess(Uri fileUri, String fileName) {
+                progressDialog.dismiss();
+
+                Intent shareIntent = new Intent(Intent.ACTION_SEND);
+                shareIntent.setType("text/csv");
+                shareIntent.putExtra(Intent.EXTRA_STREAM, fileUri);
+                shareIntent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.export_subject));
+                shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+                startActivity(Intent.createChooser(shareIntent, getString(R.string.export_chooser_title)));
+            }
+
+            @Override
+            public void onError(String errorMessage) {
+                progressDialog.dismiss();
+                Toast.makeText(requireContext(), errorMessage, Toast.LENGTH_LONG).show();
+            }
         });
     }
 }
