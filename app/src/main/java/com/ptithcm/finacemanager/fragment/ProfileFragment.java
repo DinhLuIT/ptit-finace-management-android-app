@@ -15,6 +15,7 @@ import androidx.fragment.app.Fragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.switchmaterial.SwitchMaterial;
 import com.ptithcm.finacemanager.R;
+import com.ptithcm.finacemanager.activity.ExchangeRateActivity;
 import com.ptithcm.finacemanager.activity.SavingsGoalsActivity;
 import com.ptithcm.finacemanager.activity.StatisticsActivity;
 import com.ptithcm.finacemanager.utils.NotificationHelper;
@@ -96,7 +97,8 @@ public class ProfileFragment extends Fragment {
         });
 
         view.findViewById(R.id.tv_exchange_rate).setOnClickListener(v -> {
-            Toast.makeText(requireContext(), "Coming soon", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(requireContext(), ExchangeRateActivity.class);
+            startActivity(intent);
         });
 
         view.findViewById(R.id.tv_export).setOnClickListener(v -> {

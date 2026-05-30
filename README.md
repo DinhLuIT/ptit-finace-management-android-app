@@ -526,7 +526,7 @@ CREATE TABLE RECURRING_TRANSACTIONS (
 - [x] Mục tiêu tiết kiệm (Plan A – Độc lập, Carousel trên Home)
 - [x] Giao dịch định kỳ (Recurring Transactions + WorkManager)
 - [x] Dark Mode toggle (lưu SharedPreferences + FinanceManagerApp restore)
-- [ ] ExchangeRateAPI – Tỷ giá ngoại tệ
+- [x] ExchangeRateAPI – Tỷ giá ngoại tệ (OkHttp + Gson, cache offline 24h)
 - [ ] Export báo cáo CSV
 - [ ] Biometric authentication (Fingerprint)
 - [ ] Testing & Performance optimization

@@ -2,6 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application
         android:name=".FinanceManagerApp"
         android:allowBackup="true"
@@ -62,6 +64,11 @@
         <!-- Recurring Transactions -->
         <activity
             android:name=".activity.RecurringTransactionsActivity"
+            android:exported="false" />
+
+        <!-- Exchange Rate -->
+        <activity
+            android:name=".activity.ExchangeRateActivity"
             android:exported="false" />
 
     </application>

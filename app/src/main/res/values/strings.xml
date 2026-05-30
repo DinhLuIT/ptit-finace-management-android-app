@@ -250,4 +250,16 @@
     <string name="tab_history">Lịch sử</string>
     <string name="tab_recurring">Định kỳ</string>
 
+    <!-- Exchange Rate -->
+    <string name="title_converter">Quy đổi Ngoại tệ</string>
+    <string name="title_rate_table">Bảng Tỷ giá</string>
+    <string name="hint_enter_amount">Nhập số tiền</string>
+    <string name="btn_refresh">🔄 Làm mới</string>
+    <string name="btn_retry">Thử lại</string>
+    <string name="label_last_update">Cập nhật: %1$s</string>
+    <string name="msg_loading_rates">Đang tải tỷ giá…</string>
+    <string name="msg_rate_from_cache">⚡ Tỷ giá offline – dữ liệu từ lần cập nhật trước</string>
+    <string name="error_no_connection">Không có kết nối mạng</string>
+    <string name="error_no_connection_desc">Vui lòng kiểm tra kết nối Internet\nvà thử lại</string>
+
 </resources>
