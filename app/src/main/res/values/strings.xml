@@ -226,4 +226,28 @@
     <string name="empty_contributions_subtitle">Nhấn nút bên dưới để bắt đầu\ntiết kiệm cho mục tiêu này! 💪</string>
     <string name="error_contribute_amount_invalid">Vui lòng nhập số tiền hợp lệ</string>
 
+    <!-- Recurring Transactions -->
+    <string name="label_recurring_transactions">Giao dịch định kỳ</string>
+    <string name="title_add_recurring">Thêm giao dịch định kỳ</string>
+    <string name="label_frequency">Tần suất lặp lại</string>
+    <string name="label_start_date">Ngày bắt đầu</string>
+    <string name="label_next_date">Lần tiếp theo</string>
+    <string name="freq_daily">Hàng ngày</string>
+    <string name="freq_weekly">Hàng tuần</string>
+    <string name="freq_monthly">Hàng tháng</string>
+    <string name="freq_yearly">Hàng năm</string>
+    <string name="msg_recurring_created">Đã tạo giao dịch định kỳ! 🔄</string>
+    <string name="msg_recurring_deleted">Đã xóa giao dịch định kỳ</string>
+    <string name="msg_recurring_deactivated">Đã tạm dừng giao dịch định kỳ</string>
+    <string name="msg_confirm_delete_recurring">Bạn có chắc muốn xóa giao dịch định kỳ này?</string>
+    <string name="msg_confirm_deactivate_recurring">Giao dịch sẽ không tự động tạo nữa. Bạn có muốn tạm dừng?</string>
+    <string name="btn_deactivate_recurring">Tạm dừng</string>
+    <string name="error_frequency_not_selected">Vui lòng chọn tần suất</string>
+    <string name="empty_recurring_title">Chưa có giao dịch định kỳ</string>
+    <string name="empty_recurring_subtitle">Thiết lập giao dịch tự động\ncho các khoản cố định hàng tháng! 🔄</string>
+
+    <!-- Transaction Tabs -->
+    <string name="tab_history">Lịch sử</string>
+    <string name="tab_recurring">Định kỳ</string>
+
 </resources>

@@ -59,6 +59,11 @@
             android:name=".activity.GoalDetailActivity"
             android:exported="false" />
 
+        <!-- Recurring Transactions -->
+        <activity
+            android:name=".activity.RecurringTransactionsActivity"
+            android:exported="false" />
+
     </application>
 
 </manifest>

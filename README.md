@@ -431,16 +431,30 @@ CREATE TABLE USER_SETTINGS (
 );
 ```
 
-### Bảng SAVINGS_GOALS (Phase 3)
+### Bảng SAVINGS_GOALS (Phase 3 – Plan A: Độc lập)
 ```sql
 CREATE TABLE SAVINGS_GOALS (
     ID INTEGER PRIMARY KEY AUTOINCREMENT,
-    POT_ID INTEGER NOT NULL,
     NAME TEXT NOT NULL,
     TARGET_AMOUNT REAL NOT NULL,
+    CURRENT_AMOUNT REAL DEFAULT 0,
     TARGET_DATE TEXT,
+    ICON TEXT DEFAULT '🎯',
+    COLOR TEXT DEFAULT '#4CAF50',
+    CREATED_AT TEXT NOT NULL
+);
+```
+
+### Bảng GOAL_CONTRIBUTIONS (Phase 3)
+```sql
+CREATE TABLE GOAL_CONTRIBUTIONS (
+    ID INTEGER PRIMARY KEY AUTOINCREMENT,
+    GOAL_ID INTEGER NOT NULL,
+    AMOUNT REAL NOT NULL,
+    NOTE TEXT,
+    DATE TEXT NOT NULL,
     CREATED_AT TEXT NOT NULL,
-    FOREIGN KEY(POT_ID) REFERENCES POTS(ID)
+    FOREIGN KEY(GOAL_ID) REFERENCES SAVINGS_GOALS(ID)
 );
 ```
 
@@ -453,9 +467,10 @@ CREATE TABLE RECURRING_TRANSACTIONS (
     AMOUNT REAL NOT NULL,
     TYPE TEXT NOT NULL,
     NOTE TEXT,
-    FREQUENCY TEXT NOT NULL,     -- 'DAILY' / 'WEEKLY' / 'MONTHLY'
+    FREQUENCY TEXT NOT NULL,     -- 'DAILY' / 'WEEKLY' / 'MONTHLY' / 'YEARLY'
     NEXT_DATE TEXT NOT NULL,
     IS_ACTIVE INTEGER DEFAULT 1,
+    CREATED_AT TEXT NOT NULL,
     FOREIGN KEY(POT_ID) REFERENCES POTS(ID),
     FOREIGN KEY(CATEGORY_ID) REFERENCES CATEGORIES(ID)
 );
@@ -473,6 +488,7 @@ CREATE TABLE RECURRING_TRANSACTIONS (
 | `MPAndroidChart` | Biểu đồ thống kê |
 | `Lottie` | Animations |
 | `androidx.biometric` | Fingerprint/Face unlock |
+| `androidx.work` | WorkManager – Giao dịch định kỳ chạy nền |
 | `Gson` | JSON parsing |
 | `OkHttp` | HTTP client |
 
@@ -507,10 +523,10 @@ CREATE TABLE RECURRING_TRANSACTIONS (
 - [x] ProfileFragment – Toggle bật/tắt cảnh báo ngân sách
 
 ### Phase 3: Advanced Features 🟢
+- [x] Mục tiêu tiết kiệm (Plan A – Độc lập, Carousel trên Home)
+- [x] Giao dịch định kỳ (Recurring Transactions + WorkManager)
+- [x] Dark Mode toggle (lưu SharedPreferences + FinanceManagerApp restore)
 - [ ] ExchangeRateAPI – Tỷ giá ngoại tệ
 - [ ] Export báo cáo CSV
-- [ ] Mục tiêu tiết kiệm (Savings Goals)
-- [ ] Giao dịch định kỳ (Recurring Transactions + WorkManager)
-- [ ] Dark Mode toggle (lưu SharedPreferences)
 - [ ] Biometric authentication (Fingerprint)
 - [ ] Testing & Performance optimization

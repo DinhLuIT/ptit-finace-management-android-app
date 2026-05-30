@@ -51,6 +51,9 @@ dependencies {
     // Security
     implementation libs.biometric
 
+    // Background Processing
+    implementation libs.work.runtime
+
     // Networking & JSON
     implementation libs.gson
     implementation libs.okhttp

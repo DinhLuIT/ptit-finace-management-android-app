@@ -226,4 +226,28 @@
     <string name="empty_contributions_subtitle">Tap the button below to start\nsaving for this goal! 💪</string>
     <string name="error_contribute_amount_invalid">Please enter a valid amount</string>
 
+    <!-- Recurring Transactions -->
+    <string name="label_recurring_transactions">Recurring Transactions</string>
+    <string name="title_add_recurring">Add Recurring Transaction</string>
+    <string name="label_frequency">Frequency</string>
+    <string name="label_start_date">Start date</string>
+    <string name="label_next_date">Next</string>
+    <string name="freq_daily">Daily</string>
+    <string name="freq_weekly">Weekly</string>
+    <string name="freq_monthly">Monthly</string>
+    <string name="freq_yearly">Yearly</string>
+    <string name="msg_recurring_created">Recurring transaction created! 🔄</string>
+    <string name="msg_recurring_deleted">Recurring transaction deleted</string>
+    <string name="msg_recurring_deactivated">Recurring transaction paused</string>
+    <string name="msg_confirm_delete_recurring">Are you sure you want to delete this recurring transaction?</string>
+    <string name="msg_confirm_deactivate_recurring">This transaction will no longer auto-create. Pause it?</string>
+    <string name="btn_deactivate_recurring">Pause</string>
+    <string name="error_frequency_not_selected">Please select a frequency</string>
+    <string name="empty_recurring_title">No recurring transactions</string>
+    <string name="empty_recurring_subtitle">Set up automatic transactions\nfor your fixed monthly expenses! 🔄</string>
+
+    <!-- Transaction Tabs -->
+    <string name="tab_history">History</string>
+    <string name="tab_recurring">Recurring</string>
+
 </resources>

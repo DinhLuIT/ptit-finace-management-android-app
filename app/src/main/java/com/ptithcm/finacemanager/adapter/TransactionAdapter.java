@@ -17,6 +17,7 @@ import com.ptithcm.finacemanager.model.Transaction;
 import com.ptithcm.finacemanager.utils.Constants;
 import com.ptithcm.finacemanager.utils.CurrencyFormatter;
 import com.ptithcm.finacemanager.utils.DateUtils;
+import com.ptithcm.finacemanager.utils.IconMapper;
 
 import java.util.List;
 
@@ -28,23 +29,6 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
 
     public interface OnTransactionClickListener {
         void onTransactionClick(Transaction transaction);
-    }
-
-    // Map icon names to emoji for simple display
-    private static final java.util.Map<String, String> ICON_MAP = new java.util.HashMap<>();
-    static {
-        ICON_MAP.put("ic_food", "🍜");
-        ICON_MAP.put("ic_housing", "🏠");
-        ICON_MAP.put("ic_transport", "🚗");
-        ICON_MAP.put("ic_entertainment", "🎮");
-        ICON_MAP.put("ic_education", "📚");
-        ICON_MAP.put("ic_health", "💊");
-        ICON_MAP.put("ic_shopping", "🛍");
-        ICON_MAP.put("ic_savings", "💰");
-        ICON_MAP.put("ic_salary", "💵");
-        ICON_MAP.put("ic_gift", "🎁");
-        ICON_MAP.put("ic_other", "📦");
-        ICON_MAP.put("ic_transfer", "🔄");
     }
 
     public TransactionAdapter(List<Transaction> transactionList, Context context) {
@@ -95,10 +79,8 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
         }
 
         void bind(Transaction transaction) {
-            // Category icon (emoji)
-            String iconName = transaction.getCategoryIcon();
-            String emoji = ICON_MAP.getOrDefault(iconName, "📦");
-            textViewCategoryIcon.setText(emoji);
+            // Category icon (emoji) – dùng IconMapper utility
+            textViewCategoryIcon.setText(IconMapper.toEmoji(transaction.getCategoryIcon()));
 
             // Màu nền icon theo loại giao dịch
             int backgroundColor = transaction.isIncome()

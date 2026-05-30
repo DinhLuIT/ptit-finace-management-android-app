@@ -1,225 +1,105 @@
 package com.ptithcm.finacemanager.fragment;
 
-import android.app.AlertDialog;
-import android.content.Intent;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
+import androidx.viewpager2.adapter.FragmentStateAdapter;
+import androidx.viewpager2.widget.ViewPager2;
 
-import com.google.android.material.button.MaterialButton;
-import com.google.android.material.chip.Chip;
-import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.tabs.TabLayout;
+import com.google.android.material.tabs.TabLayoutMediator;
 import com.ptithcm.finacemanager.R;
-import com.ptithcm.finacemanager.activity.AddTransactionActivity;
-import com.ptithcm.finacemanager.adapter.TransactionAdapter;
-import com.ptithcm.finacemanager.database.DBManager;
-import com.ptithcm.finacemanager.model.Transaction;
-import com.ptithcm.finacemanager.utils.Constants;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
-
+/**
+ * Fragment container cho tab "Giao dịch" trong Bottom Navigation.
+ *
+ * <p>Chứa ViewPager2 với 2 tab:
+ * <ol>
+ *     <li><b>Lịch sử</b> – {@link TransactionHistoryFragment}: danh sách giao dịch đã xảy ra</li>
+ *     <li><b>Định kỳ</b> – {@link RecurringTransactionsFragment}: quản lý giao dịch tự động lặp lại</li>
+ * </ol>
+ *
+ * <p>Sử dụng {@link TabLayoutMediator} để liên kết TabLayout với ViewPager2.
+ */
 public class TransactionsFragment extends Fragment {
 
-    private RecyclerView recyclerViewAllTransactions;
-    private Chip chipFilterAll, chipFilterIncome, chipFilterExpense;
-    private TextInputEditText editTextSearch;
+    private static final int TAB_HISTORY = 0;
+    private static final int TAB_RECURRING = 1;
+    private static final int TAB_COUNT = 2;
 
-    // Empty State views
-    private View emptyStateContainer;
-    private TextView tvEmptyIcon, tvEmptyTitle, tvEmptySubtitle;
-    private MaterialButton btnEmptyAction;
-
-    private DBManager databaseManager;
-    private TransactionAdapter transactionAdapter;
-    private List<Transaction> allTransactions = new ArrayList<>();
-
-    private String currentType = null;
-    private String currentQuery = "";
+    private ViewPager2 viewPager;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_transactions, container, false);
+        return inflater.inflate(R.layout.fragment_transactions_pager, container, false);
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        databaseManager = DBManager.getInstance(requireContext());
-        initViews(view);
-        initListeners();
-        setupRecyclerView();
-    }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        loadData();
-    }
+        TabLayout tabLayout = view.findViewById(R.id.tab_layout);
+        viewPager = view.findViewById(R.id.view_pager);
 
-    private void initViews(View view) {
-        recyclerViewAllTransactions = view.findViewById(R.id.rv_all_transactions);
-        chipFilterAll = view.findViewById(R.id.chip_all);
-        chipFilterIncome = view.findViewById(R.id.chip_income);
-        chipFilterExpense = view.findViewById(R.id.chip_expense);
-        editTextSearch = view.findViewById(R.id.et_search);
+        // Adapter cho ViewPager2
+        viewPager.setAdapter(new TransactionsPagerAdapter(this));
 
-        // Empty State – sử dụng layout tái sử dụng
-        emptyStateContainer = view.findViewById(R.id.include_empty_state);
-        tvEmptyIcon = emptyStateContainer.findViewById(R.id.tv_empty_icon);
-        tvEmptyTitle = emptyStateContainer.findViewById(R.id.tv_empty_title);
-        tvEmptySubtitle = emptyStateContainer.findViewById(R.id.tv_empty_subtitle);
-        btnEmptyAction = emptyStateContainer.findViewById(R.id.btn_empty_action);
-    }
-
-    private void initListeners() {
-        chipFilterAll.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            if (isChecked) {
-                currentType = null;
-                applyFilters();
+        // Liên kết TabLayout với ViewPager2
+        new TabLayoutMediator(tabLayout, viewPager, (tab, position) -> {
+            switch (position) {
+                case TAB_HISTORY:
+                    tab.setText(R.string.tab_history);
+                    tab.setIcon(R.drawable.ic_history);
+                    break;
+                case TAB_RECURRING:
+                    tab.setText(R.string.tab_recurring);
+                    tab.setIcon(R.drawable.ic_recurring);
+                    break;
             }
-        });
-        chipFilterIncome.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            if (isChecked) {
-                currentType = Constants.TYPE_INCOME;
-                applyFilters();
-            }
-        });
-        chipFilterExpense.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            if (isChecked) {
-                currentType = Constants.TYPE_EXPENSE;
-                applyFilters();
-            }
-        });
-
-        editTextSearch.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence textSequence, int start, int count, int after) {}
-
-            @Override
-            public void onTextChanged(CharSequence textSequence, int start, int before, int count) {
-                currentQuery = textSequence.toString().trim().toLowerCase();
-                applyFilters();
-            }
-
-            @Override
-            public void afterTextChanged(Editable editableText) {}
-        });
-
-        // Nút hành động trong Empty State – đặt lại bộ lọc
-        btnEmptyAction.setOnClickListener(v -> resetFilters());
-    }
-
-    private void setupRecyclerView() {
-        transactionAdapter = new TransactionAdapter(allTransactions, requireContext());
-        transactionAdapter.setOnTransactionClickListener(this::showTransactionOptionsDialog);
-        recyclerViewAllTransactions.setLayoutManager(new LinearLayoutManager(requireContext()));
-        recyclerViewAllTransactions.setAdapter(transactionAdapter);
-    }
-
-    private void showTransactionOptionsDialog(Transaction transaction) {
-        String[] options = {getString(R.string.title_edit_transaction), getString(R.string.btn_delete)};
-        new AlertDialog.Builder(requireContext())
-                .setTitle(R.string.title_transaction_options)
-                .setItems(options, (dialog, which) -> {
-                    if (which == 0) {
-                        Intent intent = new Intent(requireContext(), AddTransactionActivity.class);
-                        intent.putExtra(Constants.EXTRA_TRANSACTION_ID, transaction.getId());
-                        startActivity(intent);
-                    } else if (which == 1) {
-                        confirmDeleteTransaction(transaction);
-                    }
-                })
-                .show();
-    }
-
-    private void confirmDeleteTransaction(Transaction transaction) {
-        new AlertDialog.Builder(requireContext())
-                .setTitle(R.string.btn_delete)
-                .setMessage(R.string.msg_confirm_delete)
-                .setPositiveButton(R.string.btn_delete, (dialog, which) -> {
-                    databaseManager.deleteTransaction(transaction.getId());
-                    loadData();
-                })
-                .setNegativeButton(R.string.btn_cancel, null)
-                .show();
-    }
-
-    private void loadData() {
-        allTransactions = databaseManager.getAllTransactions();
-        applyFilters();
-    }
-
-    private void applyFilters() {
-        List<Transaction> filteredTransactions = allTransactions.stream()
-                .filter(transaction -> {
-                    if (currentType != null && !currentType.equals(transaction.getType())) {
-                        return false;
-                    }
-                    if (!currentQuery.isEmpty()) {
-                        String transactionNote = transaction.getNote() != null ? transaction.getNote().toLowerCase() : "";
-                        String categoryName = transaction.getLocalizedCategoryName(requireContext()).toLowerCase();
-                        return transactionNote.contains(currentQuery) || categoryName.contains(currentQuery);
-                    }
-                    return true;
-                })
-                .collect(Collectors.toList());
-
-        transactionAdapter.updateData(filteredTransactions);
-        updateEmptyState(filteredTransactions);
+        }).attach();
     }
 
     /**
-     * Cập nhật giao diện Empty State theo ngữ cảnh:
-     * - Nếu danh sách gốc trống → hiện "Chưa có giao dịch nào"
-     * - Nếu danh sách gốc có data nhưng lọc ra trống → hiện "Không tìm thấy kết quả"
+     * Chuyển sang sub-tab Định kỳ (Recurring).
+     * Được gọi từ ProfileFragment khi user nhấn "Giao dịch định kỳ".
      */
-    private void updateEmptyState(List<Transaction> filteredList) {
-        if (filteredList.isEmpty()) {
-            emptyStateContainer.setVisibility(View.VISIBLE);
-            recyclerViewAllTransactions.setVisibility(View.GONE);
-
-            if (allTransactions.isEmpty()) {
-                // Chưa có giao dịch nào (danh sách gốc trống)
-                tvEmptyIcon.setText("📋");
-                tvEmptyTitle.setText(R.string.empty_transactions_title);
-                tvEmptySubtitle.setText(R.string.empty_transactions_subtitle);
-                btnEmptyAction.setVisibility(View.GONE);
-            } else {
-                // Có data nhưng bộ lọc/search không trả về kết quả
-                tvEmptyIcon.setText("🔍");
-                tvEmptyTitle.setText(R.string.empty_search_title);
-                tvEmptySubtitle.setText(R.string.empty_search_subtitle);
-                btnEmptyAction.setText(R.string.btn_reset_filter);
-                btnEmptyAction.setVisibility(View.VISIBLE);
-            }
-        } else {
-            emptyStateContainer.setVisibility(View.GONE);
-            recyclerViewAllTransactions.setVisibility(View.VISIBLE);
+    public void selectRecurringTab() {
+        if (viewPager != null) {
+            viewPager.setCurrentItem(TAB_RECURRING, true);
         }
     }
 
     /**
-     * Đặt lại tất cả bộ lọc và tìm kiếm về trạng thái mặc định.
+     * PagerAdapter quản lý 2 child fragments: History và Recurring.
      */
-    private void resetFilters() {
-        currentType = null;
-        currentQuery = "";
-        chipFilterAll.setChecked(true);
-        editTextSearch.setText("");
-        applyFilters();
+    private static class TransactionsPagerAdapter extends FragmentStateAdapter {
+
+        TransactionsPagerAdapter(@NonNull Fragment fragment) {
+            super(fragment);
+        }
+
+        @NonNull
+        @Override
+        public Fragment createFragment(int position) {
+            switch (position) {
+                case TAB_RECURRING:
+                    return new RecurringTransactionsFragment();
+                case TAB_HISTORY:
+                default:
+                    return new TransactionHistoryFragment();
+            }
+        }
+
+        @Override
+        public int getItemCount() {
+            return TAB_COUNT;
+        }
     }
 }

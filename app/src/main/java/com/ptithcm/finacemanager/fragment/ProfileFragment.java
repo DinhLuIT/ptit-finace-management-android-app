@@ -12,6 +12,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.fragment.app.Fragment;
 
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.switchmaterial.SwitchMaterial;
 import com.ptithcm.finacemanager.R;
 import com.ptithcm.finacemanager.activity.SavingsGoalsActivity;
@@ -76,8 +77,26 @@ public class ProfileFragment extends Fragment {
             startActivity(intent);
         });
 
+        // Chuyển sang tab "Giao dịch" → sub-tab "Định kỳ"
+        view.findViewById(R.id.tv_recurring_transactions).setOnClickListener(v -> {
+            if (getActivity() != null) {
+                BottomNavigationView bottomNav = getActivity().findViewById(R.id.bnv_main);
+                if (bottomNav != null) {
+                    // Chuyển sang tab Transactions
+                    bottomNav.setSelectedItemId(R.id.nav_transactions);
+
+                    // Tìm TransactionsFragment đã cache và chuyển sang sub-tab Định kỳ
+                    Fragment transFragment = getActivity().getSupportFragmentManager()
+                            .findFragmentByTag("transactions");
+                    if (transFragment instanceof TransactionsFragment) {
+                        ((TransactionsFragment) transFragment).selectRecurringTab();
+                    }
+                }
+            }
+        });
+
         view.findViewById(R.id.tv_exchange_rate).setOnClickListener(v -> {
-            Toast.makeText(requireContext(), "Coming in Phase 3", Toast.LENGTH_SHORT).show();
+            Toast.makeText(requireContext(), "Coming soon", Toast.LENGTH_SHORT).show();
         });
 
         view.findViewById(R.id.tv_export).setOnClickListener(v -> {
