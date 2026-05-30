@@ -7,8 +7,10 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -29,76 +31,98 @@ import java.util.Locale;
 import java.util.Map;
 
 /**
- * Màn hình xem & quy đổi tỷ giá ngoại tệ.
+ * Màn hình quy đổi tỷ giá đa chiều.
  *
- * <p>Gồm 2 phần chính:
+ * <p>Hỗ trợ quy đổi bất kỳ cặp tiền tệ nào (VND↔USD, USD↔EUR, JPY↔KRW…)
+ * bằng cross-rate từ 1 lần gọi API duy nhất (base=VND).
+ *
+ * <p>Gồm 2 phần:
  * <ol>
- *     <li><b>Converter Card</b>: Nhập VNĐ → chọn ngoại tệ → hiện kết quả quy đổi</li>
- *     <li><b>Rate Table</b>: Bảng tỷ giá 9 ngoại tệ phổ biến với người Việt</li>
+ *     <li><b>Converter Card</b>: 2 Spinner (FROM/TO) + nút Swap + kết quả realtime</li>
+ *     <li><b>Rate Table</b>: Bảng tỷ giá 10 loại tiền, cập nhật theo FROM đang chọn</li>
  * </ol>
- *
- * <p>Dùng {@link ExchangeRateApiClient} (OkHttp + Gson) để fetch API miễn phí,
- * cache 24h trong SharedPreferences, fallback khi mất mạng.
  */
 public class ExchangeRateActivity extends AppCompatActivity {
 
-    // ── 9 ngoại tệ phổ biến, thứ tự: USD, EUR, GBP, JPY, KRW, CNY, AUD, SGD, THB ──
-    private static final Map<String, String[]> SUPPORTED_CURRENCIES = new LinkedHashMap<>();
+    // ── 10 loại tiền tệ hỗ trợ (bao gồm VND) ──
+    private static final Map<String, String[]> CURRENCIES = new LinkedHashMap<>();
 
     static {
         // { mã tiền, tên tiếng Việt, cờ emoji }
-        SUPPORTED_CURRENCIES.put("USD", new String[]{"Đô la Mỹ", "🇺🇸"});
-        SUPPORTED_CURRENCIES.put("EUR", new String[]{"Euro", "🇪🇺"});
-        SUPPORTED_CURRENCIES.put("GBP", new String[]{"Bảng Anh", "🇬🇧"});
-        SUPPORTED_CURRENCIES.put("JPY", new String[]{"Yên Nhật", "🇯🇵"});
-        SUPPORTED_CURRENCIES.put("KRW", new String[]{"Won Hàn Quốc", "🇰🇷"});
-        SUPPORTED_CURRENCIES.put("CNY", new String[]{"Nhân dân tệ", "🇨🇳"});
-        SUPPORTED_CURRENCIES.put("AUD", new String[]{"Đô la Úc", "🇦🇺"});
-        SUPPORTED_CURRENCIES.put("SGD", new String[]{"Đô la Singapore", "🇸🇬"});
-        SUPPORTED_CURRENCIES.put("THB", new String[]{"Baht Thái", "🇹🇭"});
+        CURRENCIES.put("VND", new String[]{"Việt Nam Đồng", "🇻🇳"});
+        CURRENCIES.put("USD", new String[]{"Đô la Mỹ", "🇺🇸"});
+        CURRENCIES.put("EUR", new String[]{"Euro", "🇪🇺"});
+        CURRENCIES.put("GBP", new String[]{"Bảng Anh", "🇬🇧"});
+        CURRENCIES.put("JPY", new String[]{"Yên Nhật", "🇯🇵"});
+        CURRENCIES.put("KRW", new String[]{"Won Hàn Quốc", "🇰🇷"});
+        CURRENCIES.put("CNY", new String[]{"Nhân dân tệ", "🇨🇳"});
+        CURRENCIES.put("AUD", new String[]{"Đô la Úc", "🇦🇺"});
+        CURRENCIES.put("SGD", new String[]{"Đô la Singapore", "🇸🇬"});
+        CURRENCIES.put("THB", new String[]{"Baht Thái", "🇹🇭"});
     }
 
     // ── Views ──
-    private EditText etAmountVnd;
-    private TextView tvConvertedAmount, tvLastUpdate, tvCacheBanner, tvRefresh;
-    private Spinner spinnerCurrency;
+    private EditText etAmountFrom;
+    private TextView tvConvertedAmount, tvDirectRate, tvLastUpdate;
+    private TextView tvCacheBanner, tvRefresh, tvRateTableTitle;
+    private Spinner spinnerFrom, spinnerTo;
+    private ImageView btnSwap;
     private RecyclerView rvRates;
-    private View layoutLoading, layoutError;
+    private View layoutLoading, layoutError, layoutRateHeader;
 
     // ── Data ──
     private ExchangeRateAdapter adapter;
     private ExchangeRateResponse currentResponse;
-    private final List<String> currencyCodes = new ArrayList<>(SUPPORTED_CURRENCIES.keySet());
+    private final List<String> currencyCodes = new ArrayList<>(CURRENCIES.keySet());
+
+    // ── Spinner display items: "🇻🇳 VND", "🇺🇸 USD" … ──
+    private final List<String> spinnerDisplayItems = new ArrayList<>();
+
+    // Suppress spinner re-trigger khi swap
+    private boolean suppressSpinnerEvents = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_exchange_rate);
 
+        buildSpinnerDisplayItems();
         initViews();
         initListeners();
-        setupSpinner();
+        setupSpinners();
         setupRecyclerView();
         fetchRates(false);
+    }
+
+    private void buildSpinnerDisplayItems() {
+        for (Map.Entry<String, String[]> entry : CURRENCIES.entrySet()) {
+            String flag = entry.getValue()[1];
+            spinnerDisplayItems.add(flag + " " + entry.getKey());
+        }
     }
 
     private void initViews() {
         findViewById(R.id.iv_back).setOnClickListener(v -> finish());
 
-        etAmountVnd = findViewById(R.id.et_amount_vnd);
+        etAmountFrom = findViewById(R.id.et_amount_from);
         tvConvertedAmount = findViewById(R.id.tv_converted_amount);
+        tvDirectRate = findViewById(R.id.tv_direct_rate);
         tvLastUpdate = findViewById(R.id.tv_last_update);
         tvCacheBanner = findViewById(R.id.tv_cache_banner);
         tvRefresh = findViewById(R.id.tv_refresh);
-        spinnerCurrency = findViewById(R.id.spinner_currency);
+        tvRateTableTitle = findViewById(R.id.tv_rate_table_title);
+        spinnerFrom = findViewById(R.id.spinner_from);
+        spinnerTo = findViewById(R.id.spinner_to);
+        btnSwap = findViewById(R.id.btn_swap);
         rvRates = findViewById(R.id.rv_rates);
         layoutLoading = findViewById(R.id.layout_loading);
         layoutError = findViewById(R.id.layout_error);
+        layoutRateHeader = findViewById(R.id.layout_rate_header);
     }
 
     private void initListeners() {
-        // Khi nhập số VND → tính toán quy đổi realtime
-        etAmountVnd.addTextChangedListener(new TextWatcher() {
+        // Realtime conversion khi nhập số
+        etAmountFrom.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 
@@ -111,41 +135,68 @@ public class ExchangeRateActivity extends AppCompatActivity {
             public void afterTextChanged(Editable s) {}
         });
 
-        // Nút làm mới tỷ giá
-        tvRefresh.setOnClickListener(v -> fetchRates(true));
+        // Swap FROM ↔ TO
+        btnSwap.setOnClickListener(v -> swapCurrencies());
 
-        // Nút thử lại (trong error state)
+        // Refresh
+        tvRefresh.setOnClickListener(v -> fetchRates(true));
         findViewById(R.id.btn_retry).setOnClickListener(v -> fetchRates(true));
     }
 
-    private void setupSpinner() {
-        // Hiện mã tiền tệ trong Spinner
+    private void setupSpinners() {
         ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(
-                this, android.R.layout.simple_spinner_item, currencyCodes);
+                this, R.layout.spinner_currency_item, spinnerDisplayItems);
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinnerCurrency.setAdapter(spinnerAdapter);
 
-        spinnerCurrency.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        spinnerFrom.setAdapter(spinnerAdapter);
+        spinnerTo.setAdapter(spinnerAdapter);
+
+        // Mặc định: FROM = VND (index 0), TO = USD (index 1)
+        spinnerFrom.setSelection(0);
+        spinnerTo.setSelection(1);
+
+        AdapterView.OnItemSelectedListener spinnerListener = new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                calculateConversion();
+                if (suppressSpinnerEvents) return;
+
+                // Validate: không cho chọn 2 loại tiền giống nhau
+                if (spinnerFrom.getSelectedItemPosition() == spinnerTo.getSelectedItemPosition()) {
+                    Toast.makeText(ExchangeRateActivity.this,
+                            R.string.msg_same_currency, Toast.LENGTH_SHORT).show();
+
+                    // Auto-sửa: đổi spinner kia sang loại tiền khác
+                    suppressSpinnerEvents = true;
+                    if (parent.getId() == R.id.spinner_from) {
+                        // FROM vừa đổi trùng TO → sửa TO
+                        spinnerTo.setSelection((position + 1) % currencyCodes.size());
+                    } else {
+                        // TO vừa đổi trùng FROM → sửa FROM
+                        spinnerFrom.setSelection((position + 1) % currencyCodes.size());
+                    }
+                    suppressSpinnerEvents = false;
+                }
+
+                onCurrencySelectionChanged();
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {}
-        });
+        };
+
+        spinnerFrom.setOnItemSelectedListener(spinnerListener);
+        spinnerTo.setOnItemSelectedListener(spinnerListener);
     }
 
     private void setupRecyclerView() {
         adapter = new ExchangeRateAdapter(new ArrayList<>());
         adapter.setOnRateClickListener(rate -> {
-            // Tap vào ngoại tệ → tự chọn loại tiền đó trong Spinner
+            // Tap vào tiền tệ → chọn làm TO currency
             int index = currencyCodes.indexOf(rate.getCurrencyCode());
             if (index >= 0) {
-                spinnerCurrency.setSelection(index);
-                // Focus vào ô nhập nếu chưa có số
-                if (etAmountVnd.getText().toString().isEmpty()) {
-                    etAmountVnd.requestFocus();
+                spinnerTo.setSelection(index);
+                if (etAmountFrom.getText().toString().isEmpty()) {
+                    etAmountFrom.requestFocus();
                 }
             }
         });
@@ -161,11 +212,10 @@ public class ExchangeRateActivity extends AppCompatActivity {
         ExchangeRateApiClient.getInstance().fetchRates(this, forceRefresh,
                 new ExchangeRateApiClient.RateCallback() {
                     @Override
-                    public void onSuccess(ExchangeRateResponse response, boolean isFromCache) {
+                    public void onSuccess(ExchangeRateResponse response, boolean isStaleCache) {
                         currentResponse = response;
-                        showContent(isFromCache);
-                        populateRateTable(response);
-                        calculateConversion();
+                        showContent(isStaleCache);
+                        onCurrencySelectionChanged();
                         updateLastUpdateText(response.getTimeLastUpdate());
                     }
 
@@ -182,93 +232,141 @@ public class ExchangeRateActivity extends AppCompatActivity {
         layoutLoading.setVisibility(View.VISIBLE);
         layoutError.setVisibility(View.GONE);
         rvRates.setVisibility(View.GONE);
+        layoutRateHeader.setVisibility(View.GONE);
     }
 
-    private void showContent(boolean fromCache) {
+    private void showContent(boolean isStaleCache) {
         layoutLoading.setVisibility(View.GONE);
         layoutError.setVisibility(View.GONE);
         rvRates.setVisibility(View.VISIBLE);
+        layoutRateHeader.setVisibility(View.VISIBLE);
 
-        // Hiện banner "Dữ liệu offline" nếu dùng cache
-        tvCacheBanner.setVisibility(fromCache ? View.VISIBLE : View.GONE);
+        // Banner chỉ hiện khi dùng cache CŨ HẾT HẠN (API thật sự lỗi)
+        tvCacheBanner.setVisibility(isStaleCache ? View.VISIBLE : View.GONE);
     }
 
     private void showError() {
         layoutLoading.setVisibility(View.GONE);
         layoutError.setVisibility(View.VISIBLE);
         rvRates.setVisibility(View.GONE);
+        layoutRateHeader.setVisibility(View.GONE);
     }
 
     // ── Business Logic ──────────────────────────────────────────
 
     /**
-     * Build danh sách 9 ExchangeRate từ API response và đẩy vào adapter.
+     * Gọi khi FROM hoặc TO thay đổi: cập nhật converter + bảng tỷ giá.
      */
-    private void populateRateTable(ExchangeRateResponse response) {
-        List<ExchangeRate> rates = new ArrayList<>();
+    private void onCurrencySelectionChanged() {
+        if (currentResponse == null) return;
 
-        for (Map.Entry<String, String[]> entry : SUPPORTED_CURRENCIES.entrySet()) {
-            String code = entry.getKey();
-            String[] info = entry.getValue();
-            double rateToVnd = response.getRateToVnd(code);
+        String fromCode = getSelectedFromCode();
+        String toCode = getSelectedToCode();
 
-            if (rateToVnd > 0) {
-                rates.add(new ExchangeRate(code, info[0], info[1], rateToVnd));
-            }
-        }
+        // Cập nhật direct rate label
+        updateDirectRateLabel(fromCode, toCode);
 
-        adapter.updateData(rates);
+        // Cập nhật bảng tỷ giá (theo FROM)
+        populateRateTable(fromCode);
+
+        // Cập nhật section title
+        tvRateTableTitle.setText(getString(R.string.title_rate_table_for, fromCode));
+
+        // Tính lại conversion
+        calculateConversion();
     }
 
     /**
-     * Tính toán quy đổi VND → ngoại tệ dựa trên input hiện tại.
+     * Đảo FROM ↔ TO với animation.
+     */
+    private void swapCurrencies() {
+        int fromIndex = spinnerFrom.getSelectedItemPosition();
+        int toIndex = spinnerTo.getSelectedItemPosition();
+
+        // Suppress events trong khi swap
+        suppressSpinnerEvents = true;
+        spinnerFrom.setSelection(toIndex);
+        spinnerTo.setSelection(fromIndex);
+        suppressSpinnerEvents = false;
+
+        // Đảo luôn số tiền input ↔ result
+        String currentInput = etAmountFrom.getText().toString();
+        String currentResult = tvConvertedAmount.getText().toString();
+
+        if (!currentResult.isEmpty() && !"0.00".equals(currentResult) && !"N/A".equals(currentResult)) {
+            etAmountFrom.setText(currentResult);
+            etAmountFrom.setSelection(etAmountFrom.getText().length());
+        }
+
+        // Animate swap button
+        btnSwap.animate()
+                .rotationBy(180f)
+                .setDuration(300)
+                .start();
+
+        // Trigger update
+        onCurrencySelectionChanged();
+    }
+
+    /**
+     * Tính quy đổi FROM → TO realtime.
      */
     private void calculateConversion() {
         if (currentResponse == null) return;
 
-        String inputText = etAmountVnd.getText().toString().trim();
+        String inputText = etAmountFrom.getText().toString().trim();
         if (inputText.isEmpty()) {
             tvConvertedAmount.setText("0.00");
             return;
         }
 
         try {
-            double vndAmount = Double.parseDouble(inputText);
-            String selectedCurrency = currencyCodes.get(spinnerCurrency.getSelectedItemPosition());
-            double rateToVnd = currentResponse.getRateToVnd(selectedCurrency);
+            double amount = Double.parseDouble(inputText);
+            String fromCode = getSelectedFromCode();
+            String toCode = getSelectedToCode();
 
-            if (rateToVnd > 0) {
-                double convertedAmount = vndAmount / rateToVnd;
-                tvConvertedAmount.setText(formatConvertedAmount(convertedAmount));
-            } else {
-                tvConvertedAmount.setText("N/A");
-            }
+            double result = currentResponse.convert(amount, fromCode, toCode);
+            tvConvertedAmount.setText(result > 0 ? formatAmount(result) : "N/A");
         } catch (NumberFormatException e) {
             tvConvertedAmount.setText("0.00");
         }
     }
 
     /**
-     * Format kết quả quy đổi: thông minh dựa trên độ lớn.
+     * Build bảng tỷ giá: 1 [currency] = ? [fromCode].
+     * Loại trừ chính fromCode khỏi danh sách.
      */
-    private String formatConvertedAmount(double amount) {
-        DecimalFormatSymbols symbols = new DecimalFormatSymbols(Locale.US);
-        DecimalFormat formatter;
+    private void populateRateTable(String fromCode) {
+        List<ExchangeRate> rates = new ArrayList<>();
 
-        if (amount >= 1000) {
-            formatter = new DecimalFormat("#,##0.00", symbols);
-        } else if (amount >= 1) {
-            formatter = new DecimalFormat("#,##0.0000", symbols);
-        } else {
-            formatter = new DecimalFormat("0.000000", symbols);
+        for (Map.Entry<String, String[]> entry : CURRENCIES.entrySet()) {
+            String code = entry.getKey();
+            if (code.equals(fromCode)) continue; // Bỏ chính nó
+
+            String[] info = entry.getValue();
+            double rateInFromCurrency = currentResponse.getRate(code, fromCode);
+
+            if (rateInFromCurrency > 0) {
+                rates.add(new ExchangeRate(code, info[0], info[1], rateInFromCurrency));
+            }
         }
 
-        return formatter.format(amount);
+        adapter.updateData(rates, fromCode);
     }
 
     /**
-     * Hiện thời gian cập nhật tỷ giá lần cuối.
+     * Hiện label: "1 USD = 25,100 VNĐ".
      */
+    private void updateDirectRateLabel(String fromCode, String toCode) {
+        double rate = currentResponse.getRate(fromCode, toCode);
+        if (rate > 0) {
+            tvDirectRate.setText(String.format("1 %s = %s %s", fromCode, formatAmount(rate), toCode));
+            tvDirectRate.setVisibility(View.VISIBLE);
+        } else {
+            tvDirectRate.setVisibility(View.GONE);
+        }
+    }
+
     private void updateLastUpdateText(String timeUtc) {
         if (timeUtc != null && !timeUtc.isEmpty()) {
             tvLastUpdate.setText(getString(R.string.label_last_update, timeUtc));
@@ -276,6 +374,36 @@ public class ExchangeRateActivity extends AppCompatActivity {
         } else {
             tvLastUpdate.setVisibility(View.GONE);
         }
+    }
+
+    // ── Helpers ──────────────────────────────────────────────────
+
+    private String getSelectedFromCode() {
+        return currencyCodes.get(spinnerFrom.getSelectedItemPosition());
+    }
+
+    private String getSelectedToCode() {
+        return currencyCodes.get(spinnerTo.getSelectedItemPosition());
+    }
+
+    /**
+     * Format số tiền thông minh dựa trên độ lớn.
+     */
+    private String formatAmount(double amount) {
+        DecimalFormatSymbols symbols = new DecimalFormatSymbols(Locale.US);
+        DecimalFormat formatter;
+
+        if (amount >= 1000) {
+            formatter = new DecimalFormat("#,##0.00", symbols);
+        } else if (amount >= 1) {
+            formatter = new DecimalFormat("#,##0.0000", symbols);
+        } else if (amount >= 0.01) {
+            formatter = new DecimalFormat("0.000000", symbols);
+        } else {
+            formatter = new DecimalFormat("0.00000000", symbols);
+        }
+
+        return formatter.format(amount);
     }
 
     @Override

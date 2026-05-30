@@ -17,14 +17,15 @@ import java.util.List;
 import java.util.Locale;
 
 /**
- * Adapter hiển thị bảng tỷ giá ngoại tệ so với VND.
+ * Adapter hiển thị bảng tỷ giá ngoại tệ.
  *
- * <p>Mỗi item hiện: cờ quốc gia, mã tiền, tên đầy đủ,
- * và tỷ giá quy đổi dạng "1 USD = 25,100 VNĐ".
+ * <p>Hỗ trợ dynamic base currency: tỷ giá hiển thị tùy thuộc vào
+ * tiền tệ FROM mà user đang chọn trong converter.
  */
 public class ExchangeRateAdapter extends RecyclerView.Adapter<ExchangeRateAdapter.ViewHolder> {
 
     private List<ExchangeRate> items;
+    private String baseCurrencyCode = "VND";
     private OnRateClickListener listener;
 
     /** Callback khi user tap vào 1 loại tiền để quy đổi nhanh. */
@@ -40,8 +41,15 @@ public class ExchangeRateAdapter extends RecyclerView.Adapter<ExchangeRateAdapte
         this.listener = listener;
     }
 
-    public void updateData(List<ExchangeRate> newItems) {
+    /**
+     * Cập nhật dữ liệu bảng tỷ giá.
+     *
+     * @param newItems         Danh sách tỷ giá mới
+     * @param baseCurrencyCode Mã tiền tệ base (FROM) để hiển thị đúng label
+     */
+    public void updateData(List<ExchangeRate> newItems, String baseCurrencyCode) {
         this.items = newItems;
+        this.baseCurrencyCode = baseCurrencyCode;
         notifyDataSetChanged();
     }
 
@@ -60,7 +68,9 @@ public class ExchangeRateAdapter extends RecyclerView.Adapter<ExchangeRateAdapte
         holder.tvFlag.setText(rate.getFlag());
         holder.tvCurrencyCode.setText(rate.getCurrencyCode());
         holder.tvCurrencyName.setText(rate.getFullName());
-        holder.tvRate.setText(formatRate(rate.getRateToVnd()));
+
+        // Hiện: "25,100 VNĐ" hoặc "1.08 USD" tùy base currency
+        holder.tvRate.setText(formatRate(rate.getRateToVnd(), baseCurrencyCode));
 
         holder.itemView.setOnClickListener(v -> {
             if (listener != null) listener.onRateClick(rate);
@@ -73,9 +83,9 @@ public class ExchangeRateAdapter extends RecyclerView.Adapter<ExchangeRateAdapte
     }
 
     /**
-     * Format tỷ giá: "1 = 25,100 VNĐ" (dùng dấu phẩy ngăn cách hàng nghìn).
+     * Format tỷ giá thông minh dựa trên độ lớn.
      */
-    private String formatRate(double rate) {
+    private String formatRate(double rate, String baseCurrency) {
         DecimalFormatSymbols symbols = new DecimalFormatSymbols(Locale.getDefault());
         symbols.setGroupingSeparator(',');
         symbols.setDecimalSeparator('.');
@@ -85,11 +95,13 @@ public class ExchangeRateAdapter extends RecyclerView.Adapter<ExchangeRateAdapte
             formatter = new DecimalFormat("#,##0", symbols);
         } else if (rate >= 1) {
             formatter = new DecimalFormat("#,##0.00", symbols);
-        } else {
+        } else if (rate >= 0.01) {
             formatter = new DecimalFormat("0.0000", symbols);
+        } else {
+            formatter = new DecimalFormat("0.000000", symbols);
         }
 
-        return formatter.format(rate) + " VNĐ";
+        return formatter.format(rate) + " " + baseCurrency;
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {

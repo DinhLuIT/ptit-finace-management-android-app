@@ -68,7 +68,7 @@
                         android:textSize="@dimen/text_subtitle"
                         android:textStyle="bold" />
 
-                    <!-- Dòng 1: Input VND -->
+                    <!-- ── Dòng FROM: Input + Spinner ── -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -77,7 +77,7 @@
                         android:orientation="horizontal">
 
                         <EditText
-                            android:id="@+id/et_amount_vnd"
+                            android:id="@+id/et_amount_from"
                             android:layout_width="0dp"
                             android:layout_height="48dp"
                             android:layout_weight="1"
@@ -85,33 +85,43 @@
                             android:hint="@string/hint_enter_amount"
                             android:inputType="numberDecimal"
                             android:maxLines="1"
-                            android:paddingHorizontal="@dimen/spacing_sm"
+                            android:paddingHorizontal="12dp"
                             android:textColor="@android:color/white"
                             android:textColorHint="#99FFFFFF"
                             android:textSize="18sp"
                             android:textStyle="bold" />
 
-                        <TextView
+                        <Spinner
+                            android:id="@+id/spinner_from"
                             android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
+                            android:layout_height="48dp"
                             android:layout_marginStart="@dimen/spacing_sm"
-                            android:text="VNĐ"
-                            android:textColor="#CCFFFFFF"
-                            android:textSize="@dimen/text_subtitle"
-                            android:textStyle="bold" />
+                            android:background="@drawable/bg_input_translucent"
+                            android:minWidth="100dp"
+                            android:paddingHorizontal="@dimen/spacing_sm"
+                            android:popupBackground="@color/color_surface" />
                     </LinearLayout>
 
-                    <!-- Icon swap -->
-                    <TextView
+                    <!-- ── Nút SWAP ── -->
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginVertical="4dp"
-                        android:gravity="center"
-                        android:text="⇅"
-                        android:textColor="#99FFFFFF"
-                        android:textSize="20sp" />
+                        android:layout_marginVertical="6dp"
+                        android:gravity="center">
 
-                    <!-- Dòng 2: Kết quả + Spinner chọn tiền tệ -->
+                        <ImageView
+                            android:id="@+id/btn_swap"
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:background="@drawable/bg_swap_circle"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:padding="8dp"
+                            android:contentDescription="@string/btn_swap"
+                            android:src="@drawable/ic_swap" />
+                    </LinearLayout>
+
+                    <!-- ── Dòng TO: Result + Spinner ── -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -125,29 +135,39 @@
                             android:layout_weight="1"
                             android:background="@drawable/bg_input_translucent"
                             android:gravity="center_vertical"
-                            android:paddingHorizontal="@dimen/spacing_sm"
+                            android:paddingHorizontal="12dp"
                             android:text="0.00"
                             android:textColor="@android:color/white"
                             android:textSize="18sp"
                             android:textStyle="bold" />
 
                         <Spinner
-                            android:id="@+id/spinner_currency"
+                            android:id="@+id/spinner_to"
                             android:layout_width="wrap_content"
                             android:layout_height="48dp"
                             android:layout_marginStart="@dimen/spacing_sm"
                             android:background="@drawable/bg_input_translucent"
-                            android:minWidth="80dp"
+                            android:minWidth="100dp"
                             android:paddingHorizontal="@dimen/spacing_sm"
                             android:popupBackground="@color/color_surface" />
                     </LinearLayout>
 
-                    <!-- Thời gian cập nhật -->
+                    <!-- ── Tỷ giá trực tiếp + Thời gian ── -->
+                    <TextView
+                        android:id="@+id/tv_direct_rate"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/spacing_sm"
+                        android:gravity="center"
+                        android:textColor="@android:color/white"
+                        android:textSize="13sp"
+                        android:textStyle="bold" />
+
                     <TextView
                         android:id="@+id/tv_last_update"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/spacing_sm"
+                        android:layout_marginTop="2dp"
                         android:gravity="center"
                         android:textColor="#99FFFFFF"
                         android:textSize="11sp" />
@@ -166,8 +186,9 @@
                     android:textSize="@dimen/text_caption"
                     android:visibility="gone" />
 
-                <!-- ═══ SECTION HEADER: Bảng tỷ giá ═══ -->
+                <!-- ═══ SECTION HEADER ═══ -->
                 <LinearLayout
+                    android:id="@+id/layout_rate_header"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center_vertical"
@@ -177,10 +198,10 @@
                     android:paddingBottom="@dimen/spacing_sm">
 
                     <TextView
+                        android:id="@+id/tv_rate_table_title"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="@string/title_rate_table"
                         android:textColor="@color/color_text_primary"
                         android:textSize="@dimen/text_subtitle"
                         android:textStyle="bold" />
@@ -193,8 +214,10 @@
                         android:padding="@dimen/spacing_xs"
                         android:text="@string/btn_refresh"
                         android:textColor="@color/color_primary"
-                        android:textSize="@dimen/text_caption"
-                        android:textStyle="bold" />
+                        android:textSize="@dimen/text_body"
+                        android:textStyle="bold"
+                        android:drawableStart="@drawable/ic_refresh"
+                        android:drawablePadding="4dp" />
                 </LinearLayout>
 
                 <!-- ═══ RATE TABLE ═══ -->

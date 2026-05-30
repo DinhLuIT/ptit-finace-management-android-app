@@ -55,8 +55,14 @@ public class ExchangeRateApiClient {
      * Callback interface – mọi method đều chạy trên Main Thread.
      */
     public interface RateCallback {
-        /** Gọi khi có dữ liệu (từ API hoặc cache). */
-        void onSuccess(ExchangeRateResponse response, boolean isFromCache);
+        /**
+         * Gọi khi có dữ liệu (từ API, fresh cache, hoặc stale cache).
+         *
+         * @param response     Dữ liệu tỷ giá
+         * @param isStaleCache true CHỈ KHI API lỗi và phải dùng cache cũ hết hạn.
+         *                     false nếu data từ API mới hoặc cache còn hạn.
+         */
+        void onSuccess(ExchangeRateResponse response, boolean isStaleCache);
 
         /** Gọi khi không thể lấy dữ liệu (mất mạng + không có cache). */
         void onError(String errorMessage);
@@ -89,11 +95,11 @@ public class ExchangeRateApiClient {
     public void fetchRates(@NonNull Context context, boolean forceRefresh,
                            @NonNull RateCallback callback) {
         executor.execute(() -> {
-            // 1. Check cache
+            // 1. Check fresh cache (còn hạn < 24h → trả ngay, KHÔNG đánh dấu stale)
             if (!forceRefresh) {
                 ExchangeRateResponse cached = loadFromCache(context);
                 if (cached != null) {
-                    postSuccess(callback, cached, true);
+                    postSuccess(callback, cached, false); // fresh cache = not stale
                     return;
                 }
             }
@@ -134,7 +140,7 @@ public class ExchangeRateApiClient {
     private void handleApiError(Context context, RateCallback callback, String errorMsg) {
         ExchangeRateResponse staleCache = loadFromCacheIgnoreTTL(context);
         if (staleCache != null) {
-            postSuccess(callback, staleCache, true);
+            postSuccess(callback, staleCache, true); // API lỗi + fallback = stale
         } else {
             mainHandler.post(() -> callback.onError(errorMsg));
         }

@@ -253,13 +253,16 @@
     <!-- Exchange Rate -->
     <string name="title_converter">Currency Converter</string>
     <string name="title_rate_table">Exchange Rates</string>
+    <string name="title_rate_table_for">Rates vs %1$s</string>
     <string name="hint_enter_amount">Enter amount</string>
-    <string name="btn_refresh">🔄 Refresh</string>
+    <string name="btn_refresh">Refresh</string>
+    <string name="btn_swap">Swap</string>
     <string name="btn_retry">Retry</string>
     <string name="label_last_update">Updated: %1$s</string>
     <string name="msg_loading_rates">Loading exchange rates…</string>
     <string name="msg_rate_from_cache">⚡ Offline rates – data from last update</string>
     <string name="error_no_connection">No internet connection</string>
     <string name="error_no_connection_desc">Please check your connection\nand try again</string>
+    <string name="msg_same_currency">Please select 2 different currencies</string>
 
 </resources>
