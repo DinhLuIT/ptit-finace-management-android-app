@@ -21,10 +21,12 @@ import com.ptithcm.finacemanager.adapter.ExchangeRateAdapter;
 import com.ptithcm.finacemanager.model.ExchangeRate;
 import com.ptithcm.finacemanager.model.ExchangeRateResponse;
 import com.ptithcm.finacemanager.network.ExchangeRateApiClient;
+import com.ptithcm.finacemanager.utils.CurrencyTextWatcher;
 
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
@@ -74,6 +76,7 @@ public class ExchangeRateActivity extends AppCompatActivity {
     private ExchangeRateAdapter adapter;
     private ExchangeRateResponse currentResponse;
     private final List<String> currencyCodes = new ArrayList<>(CURRENCIES.keySet());
+    private CurrencyTextWatcher currencyTextWatcher;
 
     // ── Spinner display items: "🇻🇳 VND", "🇺🇸 USD" … ──
     private final List<String> spinnerDisplayItems = new ArrayList<>();
@@ -121,19 +124,9 @@ public class ExchangeRateActivity extends AppCompatActivity {
     }
 
     private void initListeners() {
-        // Realtime conversion khi nhập số
-        etAmountFrom.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                calculateConversion();
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {}
-        });
+        // Realtime conversion + formatting khi nhập số
+        currencyTextWatcher = new CurrencyTextWatcher(etAmountFrom, this::calculateConversion);
+        etAmountFrom.addTextChangedListener(currencyTextWatcher);
 
         // Swap FROM ↔ TO
         btnSwap.setOnClickListener(v -> swapCurrencies());
@@ -272,6 +265,9 @@ public class ExchangeRateActivity extends AppCompatActivity {
         // Cập nhật section title
         tvRateTableTitle.setText(getString(R.string.title_rate_table_for, fromCode));
 
+        // Cập nhật luật format cho ô nhập tiền
+        currencyTextWatcher.setCurrencyCode(fromCode);
+
         // Tính lại conversion
         calculateConversion();
     }
@@ -290,19 +286,15 @@ public class ExchangeRateActivity extends AppCompatActivity {
         suppressSpinnerEvents = false;
 
         // Đảo luôn số tiền input ↔ result
-        String currentInput = etAmountFrom.getText().toString();
         String currentResult = tvConvertedAmount.getText().toString();
+
+        // Cập nhật luật format cho watcher trước khi gán text mới vào
+        currencyTextWatcher.setCurrencyCode(currencyCodes.get(toIndex));
 
         if (!currentResult.isEmpty() && !"0.00".equals(currentResult) && !"N/A".equals(currentResult)) {
             etAmountFrom.setText(currentResult);
             etAmountFrom.setSelection(etAmountFrom.getText().length());
         }
-
-        // Animate swap button
-        btnSwap.animate()
-                .rotationBy(180f)
-                .setDuration(300)
-                .start();
 
         // Trigger update
         onCurrencySelectionChanged();
@@ -321,13 +313,15 @@ public class ExchangeRateActivity extends AppCompatActivity {
         }
 
         try {
-            double amount = Double.parseDouble(inputText);
             String fromCode = getSelectedFromCode();
             String toCode = getSelectedToCode();
+            
+            // Dùng hàm tiện ích của watcher để xóa sạch các dấu format trước khi parse
+            double amount = CurrencyTextWatcher.parseFormattedValue(inputText, fromCode);
 
             double result = currentResponse.convert(amount, fromCode, toCode);
-            tvConvertedAmount.setText(result > 0 ? formatAmount(result) : "N/A");
-        } catch (NumberFormatException e) {
+            tvConvertedAmount.setText(result > 0 ? formatMoneyResult(result, toCode) : "0.00");
+        } catch (Exception e) {
             tvConvertedAmount.setText("0.00");
         }
     }
@@ -360,7 +354,7 @@ public class ExchangeRateActivity extends AppCompatActivity {
     private void updateDirectRateLabel(String fromCode, String toCode) {
         double rate = currentResponse.getRate(fromCode, toCode);
         if (rate > 0) {
-            tvDirectRate.setText(String.format("1 %s = %s %s", fromCode, formatAmount(rate), toCode));
+            tvDirectRate.setText(String.format("1 %s = %s %s", fromCode, formatExchangeRate(rate), toCode));
             tvDirectRate.setVisibility(View.VISIBLE);
         } else {
             tvDirectRate.setVisibility(View.GONE);
@@ -387,23 +381,48 @@ public class ExchangeRateActivity extends AppCompatActivity {
     }
 
     /**
-     * Format số tiền thông minh dựa trên độ lớn.
+     * Format số tiền kết quả (Hiển thị đẹp theo chuẩn loại tiền đích).
      */
-    private String formatAmount(double amount) {
-        DecimalFormatSymbols symbols = new DecimalFormatSymbols(Locale.US);
-        DecimalFormat formatter;
-
-        if (amount >= 1000) {
-            formatter = new DecimalFormat("#,##0.00", symbols);
-        } else if (amount >= 1) {
-            formatter = new DecimalFormat("#,##0.0000", symbols);
-        } else if (amount >= 0.01) {
-            formatter = new DecimalFormat("0.000000", symbols);
+    private String formatMoneyResult(double amount, String currencyCode) {
+        boolean isZeroDecimal = Arrays.asList("VND", "JPY", "KRW").contains(currencyCode);
+        
+        if (isZeroDecimal) {
+            DecimalFormatSymbols symbols = new DecimalFormatSymbols(Locale.getDefault());
+            symbols.setGroupingSeparator('.');
+            DecimalFormat formatter = new DecimalFormat("#,###", symbols);
+            return formatter.format(Math.round(amount));
         } else {
-            formatter = new DecimalFormat("0.00000000", symbols);
+            DecimalFormatSymbols symbols = new DecimalFormatSymbols(Locale.US);
+            symbols.setGroupingSeparator(',');
+            symbols.setDecimalSeparator('.');
+            DecimalFormat formatter = new DecimalFormat("#,##0.00", symbols);
+            return formatter.format(amount);
+        }
+    }
+
+    /**
+     * Format tỷ giá trực tiếp (Cần độ chính xác cao nhưng không bị dư số 0).
+     */
+    private String formatExchangeRate(double rate) {
+        DecimalFormatSymbols symbols = new DecimalFormatSymbols(Locale.US);
+        symbols.setGroupingSeparator(',');
+        symbols.setDecimalSeparator('.');
+
+        DecimalFormat formatter;
+        if (rate >= 1000) {
+            formatter = new DecimalFormat("#,##0.##", symbols); // VD: 25,316
+        } else if (rate >= 1) {
+            formatter = new DecimalFormat("#,##0.####", symbols); // VD: 1.2345
+        } else {
+            formatter = new DecimalFormat("0.000000", symbols); // VD: 0.000038
         }
 
-        return formatter.format(amount);
+        // Cắt bỏ số 0 vô nghĩa ở đuôi nếu có phần thập phân
+        String result = formatter.format(rate);
+        if (result.contains(".") && rate >= 1) {
+            result = result.replaceAll("0*$", "").replaceAll("\\.$", "");
+        }
+        return result;
     }
 
     @Override

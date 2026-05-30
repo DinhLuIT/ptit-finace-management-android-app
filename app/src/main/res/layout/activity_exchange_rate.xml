@@ -84,6 +84,7 @@
                             android:background="@drawable/bg_input_translucent"
                             android:hint="@string/hint_enter_amount"
                             android:inputType="numberDecimal"
+                            android:maxLength="15"
                             android:maxLines="1"
                             android:paddingHorizontal="12dp"
                             android:textColor="@android:color/white"

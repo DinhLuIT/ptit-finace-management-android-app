@@ -117,7 +117,13 @@ public class ExchangeRateApiClient {
                     }
 
                     String json = response.body().string();
-                    ExchangeRateResponse rateResponse = gson.fromJson(json, ExchangeRateResponse.class);
+                    ExchangeRateResponse rateResponse;
+                    try {
+                        rateResponse = gson.fromJson(json, ExchangeRateResponse.class);
+                    } catch (Exception e) {
+                        handleApiError(context, callback, "Dữ liệu trả về bị lỗi định dạng");
+                        return;
+                    }
 
                     if (rateResponse == null || !rateResponse.isSuccess()) {
                         handleApiError(context, callback, "API trả về lỗi");

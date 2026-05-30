@@ -13,6 +13,7 @@ import com.ptithcm.finacemanager.model.ExchangeRate;
 
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
@@ -83,25 +84,36 @@ public class ExchangeRateAdapter extends RecyclerView.Adapter<ExchangeRateAdapte
     }
 
     /**
-     * Format tỷ giá thông minh dựa trên độ lớn.
+     * Format tỷ giá thông minh dựa trên loại tiền tệ.
      */
     private String formatRate(double rate, String baseCurrency) {
-        DecimalFormatSymbols symbols = new DecimalFormatSymbols(Locale.getDefault());
-        symbols.setGroupingSeparator(',');
-        symbols.setDecimalSeparator('.');
-
-        DecimalFormat formatter;
-        if (rate >= 1000) {
-            formatter = new DecimalFormat("#,##0", symbols);
-        } else if (rate >= 1) {
-            formatter = new DecimalFormat("#,##0.00", symbols);
-        } else if (rate >= 0.01) {
-            formatter = new DecimalFormat("0.0000", symbols);
+        boolean isZeroDecimal = Arrays.asList("VND", "JPY", "KRW").contains(baseCurrency);
+        
+        if (isZeroDecimal) {
+            DecimalFormatSymbols symbols = new DecimalFormatSymbols(Locale.getDefault());
+            symbols.setGroupingSeparator('.');
+            DecimalFormat formatter = new DecimalFormat("#,###", symbols);
+            return formatter.format(Math.round(rate)) + " " + baseCurrency;
         } else {
-            formatter = new DecimalFormat("0.000000", symbols);
+            DecimalFormatSymbols symbols = new DecimalFormatSymbols(Locale.US);
+            symbols.setGroupingSeparator(',');
+            symbols.setDecimalSeparator('.');
+    
+            DecimalFormat formatter;
+            if (rate >= 1000) {
+                formatter = new DecimalFormat("#,##0.##", symbols);
+            } else if (rate >= 1) {
+                formatter = new DecimalFormat("#,##0.####", symbols);
+            } else {
+                formatter = new DecimalFormat("0.000000", symbols);
+            }
+            
+            String result = formatter.format(rate);
+            if (result.contains(".") && rate >= 1) {
+                result = result.replaceAll("0*$", "").replaceAll("\\.$", "");
+            }
+            return result + " " + baseCurrency;
         }
-
-        return formatter.format(rate) + " " + baseCurrency;
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {
