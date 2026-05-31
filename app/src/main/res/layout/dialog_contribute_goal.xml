@@ -30,7 +30,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:text="Đóng góp"
+                android:text="@string/label_contribute"
                 android:textColor="@color/color_text_primary"
                 android:textSize="20sp"
                 android:textStyle="bold" />
@@ -105,7 +105,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
-                android:text="Đóng góp"
+                android:text="@string/label_contribute"
                 android:backgroundTint="@color/color_primary" />
         </LinearLayout>
     </LinearLayout>

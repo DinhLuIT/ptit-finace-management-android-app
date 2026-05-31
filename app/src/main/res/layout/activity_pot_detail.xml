@@ -76,7 +76,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/label_balance"
-                    android:textColor="#B3FFFFFF"
+                    android:textColor="@color/color_text_on_primary_secondary"
                     android:textSize="@dimen/text_body" />
 
                 <TextView
@@ -101,7 +101,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/spacing_xs"
-                    android:textColor="#B3FFFFFF"
+                    android:textColor="@color/color_text_on_primary_secondary"
                     android:textSize="@dimen/text_caption" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>

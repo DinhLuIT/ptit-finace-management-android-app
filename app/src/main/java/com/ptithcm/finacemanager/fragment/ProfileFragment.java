@@ -2,16 +2,19 @@ package com.ptithcm.finacemanager.fragment;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatDelegate;
+import androidx.biometric.BiometricManager;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -21,12 +24,15 @@ import com.ptithcm.finacemanager.activity.ExchangeRateActivity;
 import com.ptithcm.finacemanager.activity.SavingsGoalsActivity;
 import com.ptithcm.finacemanager.activity.StatisticsActivity;
 import com.ptithcm.finacemanager.utils.CSVExportHelper;
+import com.ptithcm.finacemanager.utils.Constants;
 import com.ptithcm.finacemanager.utils.NotificationHelper;
 
 public class ProfileFragment extends Fragment {
 
     private SwitchMaterial switchDarkMode;
     private SwitchMaterial switchNotification;
+    private SwitchMaterial switchBiometric;
+    private TextView tvBiometricDesc;
 
     @Nullable
     @Override
@@ -45,6 +51,8 @@ public class ProfileFragment extends Fragment {
     private void initViews(View view) {
         switchDarkMode = view.findViewById(R.id.switch_dark_mode);
         switchNotification = view.findViewById(R.id.switch_notification);
+        switchBiometric = view.findViewById(R.id.switch_biometric);
+        tvBiometricDesc = view.findViewById(R.id.tv_biometric_desc);
 
         // Đặt trạng thái ban đầu cho dark mode
         int currentMode = AppCompatDelegate.getDefaultNightMode();
@@ -52,11 +60,18 @@ public class ProfileFragment extends Fragment {
 
         // Đặt trạng thái ban đầu cho notification từ SharedPreferences
         switchNotification.setChecked(NotificationHelper.isNotificationEnabled(requireContext()));
+
+        // Thiết lập trạng thái ban đầu cho Biometric
+        initBiometricSwitch();
     }
 
     private void initListeners(View view) {
-        // Toggle Dark Mode
+        // Toggle Dark Mode (lưu vào SharedPreferences để khôi phục khi khởi động lại)
         switchDarkMode.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            SharedPreferences prefs = requireContext()
+                    .getSharedPreferences(Constants.PREF_NAME, android.content.Context.MODE_PRIVATE);
+            prefs.edit().putBoolean(Constants.PREF_DARK_MODE, isChecked).apply();
+
             if (isChecked) {
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
             } else {
@@ -144,5 +159,33 @@ public class ProfileFragment extends Fragment {
                 Toast.makeText(requireContext(), errorMessage, Toast.LENGTH_LONG).show();
             }
         });
+    }
+
+    /**
+     * Thiết lập switch Sinh trắc học:
+     * - Kiểm tra phần cứng có hỗ trợ không (BiometricManager).
+     * - Nếu không hỗ trợ hoặc chưa enroll vân tay: disable switch và thay text mô tả.
+     * - Nếu hỗ trợ: đọc trạng thái từ SharedPreferences và lắng nghe thay đổi.
+     */
+    private void initBiometricSwitch() {
+        BiometricManager biometricManager = BiometricManager.from(requireContext());
+        int canAuth = biometricManager.canAuthenticate(
+                BiometricManager.Authenticators.BIOMETRIC_WEAK);
+
+        if (canAuth != BiometricManager.BIOMETRIC_SUCCESS) {
+            // Thiết bị không hỗ trợ hoặc chưa cài vân tay
+            switchBiometric.setEnabled(false);
+            switchBiometric.setChecked(false);
+            tvBiometricDesc.setText(R.string.msg_biometric_not_available);
+        } else {
+            // Thiết bị hỗ trợ → đọc trạng thái đã lưu
+            SharedPreferences prefs = requireContext()
+                    .getSharedPreferences(Constants.PREF_NAME, android.content.Context.MODE_PRIVATE);
+            switchBiometric.setChecked(prefs.getBoolean(Constants.PREF_BIOMETRIC_ENABLED, false));
+
+            switchBiometric.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                prefs.edit().putBoolean(Constants.PREF_BIOMETRIC_ENABLED, isChecked).apply();
+            });
+        }
     }
 }

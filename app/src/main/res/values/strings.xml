@@ -213,6 +213,7 @@
     <string name="label_no_deadline">Không có thời hạn</string>
     <string name="label_goal_completed">Đã hoàn thành!</string>
     <string name="label_optional">Không bắt buộc</string>
+    <string name="label_preview">Xem trước</string>
     <string name="label_contribute">Đóng góp</string>
     <string name="label_contribution_history">Lịch sử đóng góp</string>
     <string name="hint_contribute_amount">Số tiền đóng góp</string>
@@ -270,5 +271,13 @@
     <string name="export_subject">Báo cáo Tài chính – Finance Manager</string>
     <string name="export_chooser_title">Chia sẻ báo cáo qua</string>
     <string name="msg_export_empty">Không có giao dịch nào để xuất</string>
+
+    <!-- Biometric -->
+    <string name="label_biometric">Mở khóa sinh trắc học</string>
+    <string name="label_biometric_desc">Dùng vân tay hoặc khuôn mặt để mở ứng dụng</string>
+    <string name="biometric_prompt_title">Xác thực sinh trắc học</string>
+    <string name="biometric_prompt_subtitle">Chạm cảm biến vân tay để mở khóa</string>
+    <string name="biometric_prompt_cancel">Dùng mã PIN</string>
+    <string name="msg_biometric_not_available">Thiết bị chưa cài đặt vân tay / khuôn mặt</string>
 
 </resources>

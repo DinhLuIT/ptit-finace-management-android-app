@@ -170,10 +170,19 @@
             android:text="9"
             android:textSize="@dimen/pin_button_text" />
 
-        <!-- Empty spacer -->
-        <Space
+        <!-- Fingerprint button (hiện khi biometric enabled) -->
+        <ImageView
+            android:id="@+id/iv_fingerprint"
             android:layout_width="@dimen/pin_button_size"
-            android:layout_height="@dimen/pin_button_size" />
+            android:layout_height="@dimen/pin_button_size"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:focusable="true"
+            android:contentDescription="@string/label_biometric"
+            android:padding="20dp"
+            android:src="@drawable/ic_fingerprint"
+            android:visibility="gone"
+            app:tint="@color/color_primary" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_0"

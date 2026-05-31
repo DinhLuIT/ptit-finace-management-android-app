@@ -52,4 +52,14 @@
     <color name="color_splash_bg">#00B14F</color>
     <color name="color_pin_dot">#00B14F</color>
     <color name="color_pin_dot_empty">#E0E0E0</color>
+
+    <!-- Text on Primary (dùng trên nền xanh primary) -->
+    <color name="color_text_on_primary_secondary">#B3FFFFFF</color>
+    <color name="color_text_on_primary_hint">#99FFFFFF</color>
+
+    <!-- Search Box / Tab Background -->
+    <color name="color_search_bg">#E8F5E9</color>
+
+    <!-- Progress Track -->
+    <color name="color_progress_track">#E8F5E9</color>
 </resources>

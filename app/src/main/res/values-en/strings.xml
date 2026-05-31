@@ -213,6 +213,7 @@
     <string name="label_no_deadline">No deadline</string>
     <string name="label_goal_completed">Completed!</string>
     <string name="label_optional">Optional</string>
+    <string name="label_preview">Preview</string>
     <string name="label_contribute">Contribute</string>
     <string name="label_contribution_history">Contribution History</string>
     <string name="hint_contribute_amount">Contribution amount</string>
@@ -270,5 +271,13 @@
     <string name="export_subject">Finance Report – Finance Manager</string>
     <string name="export_chooser_title">Share report via</string>
     <string name="msg_export_empty">No transactions to export</string>
+
+    <!-- Biometric -->
+    <string name="label_biometric">Biometric Unlock</string>
+    <string name="label_biometric_desc">Use fingerprint or face to unlock the app</string>
+    <string name="biometric_prompt_title">Biometric Authentication</string>
+    <string name="biometric_prompt_subtitle">Touch the fingerprint sensor to unlock</string>
+    <string name="biometric_prompt_cancel">Use PIN</string>
+    <string name="msg_biometric_not_available">No biometric enrolled on this device</string>
 
 </resources>

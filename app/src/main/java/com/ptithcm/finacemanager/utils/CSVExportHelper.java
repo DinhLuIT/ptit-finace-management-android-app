@@ -157,14 +157,10 @@ public class CSVExportHelper {
                 row.append(escapeCSV(trans.getPotName() != null ? trans.getPotName() : ""));
                 row.append(",");
 
-                // Danh mục (tên đã bản địa hóa)
+                // Danh mục (chỉ lấy tên đã bản địa hóa, không gắn icon drawable)
                 String category = trans.getLocalizedCategoryName(context);
                 if (category == null || category.isEmpty()) {
                     category = trans.getCategoryName() != null ? trans.getCategoryName() : "";
-                }
-                // Gắn icon nếu có
-                if (trans.getCategoryIcon() != null && !trans.getCategoryIcon().isEmpty()) {
-                    category = trans.getCategoryIcon() + " " + category;
                 }
                 row.append(escapeCSV(category));
                 row.append(",");

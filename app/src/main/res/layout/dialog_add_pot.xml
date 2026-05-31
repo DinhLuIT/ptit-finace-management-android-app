@@ -57,7 +57,7 @@
                     android:layout_marginTop="4dp"
                     android:textColor="@color/color_text_hint"
                     android:textSize="11sp"
-                    android:text="Xem trước" />
+                    android:text="@string/label_preview" />
             </LinearLayout>
         </FrameLayout>
 

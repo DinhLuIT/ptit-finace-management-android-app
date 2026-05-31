@@ -37,19 +37,25 @@ com.ptithcm.finacemanager/
 ├── fragment/              ← Fragments cho Bottom Navigation
 │   ├── HomeFragment       ← Dashboard tổng quan
 │   ├── PotsFragment       ← Danh sách hủ chi tiêu
-│   ├── TransactionsFragment ← Lịch sử giao dịch
+│   ├── TransactionsFragment ← Lịch sử giao dịch (History + Recurring tabs)
 │   └── ProfileFragment    ← Hồ sơ & cài đặt
 ├── adapter/               ← RecyclerView Adapters
 ├── model/                 ← Data models (POJO)
-├── database/              ← SQLite helper (DBManager)
+├── database/              ← SQLite helper (DBManager – Singleton)
 ├── api/                   ← API clients (Exchange Rate)
+├── worker/                ← Background Workers
+│   └── RecurringTransactionWorker ← WorkManager xử lý giao dịch định kỳ (24h)
 ├── utils/                 ← Utility/Helper classes
 │   ├── CustomToast         ← Toast tùy chỉnh (Success/Error/Warning)
 │   ├── NotificationHelper  ← Quản lý Local Notification cảnh báo ngân sách
-│   └── ...
+│   ├── CSVExportHelper     ← Xuất báo cáo CSV (ExecutorService, UTF-8 + BOM)
+│   ├── CurrencyFormatter   ← Format tiền tệ theo locale
+│   └── Constants           ← Hằng số toàn cục (DB, SharedPreferences, ...)
 └── dialog/                ← Custom DialogFragments
-    ├── BudgetAlertDialog   ← Dialog cảnh báo ngân sách siêu đẹp
-    └── ...
+    ├── BudgetAlertDialog   ← Dialog cảnh báo ngân sách
+    ├── AddPotDialog        ← Dialog tạo hủ mới
+    ├── AddGoalDialog       ← Dialog tạo mục tiêu tiết kiệm
+    └── AddRecurringDialog  ← Dialog tạo giao dịch định kỳ
 ```
 
 ### Nguyên tắc kiến trúc
@@ -113,8 +119,8 @@ Shape:          shape_xxx.xml            (VD: shape_circle.xml)
 
 #### String Resources (I18N)
 ```
-strings.xml:        Tiếng Anh (mặc định)
-strings.xml (vi):   Tiếng Việt (values-vi/strings.xml)
+values/strings.xml:      Tiếng Việt (mặc định)
+values-en/strings.xml:   Tiếng Anh
 
 Key format:         snake_case
 Prefix theo context:
@@ -260,14 +266,14 @@ try {
 
 ## Use Cases
 
-### 🔐 UC-01: Xác Thực PIN
+### 🔐 UC-01: Xác Thực PIN & Sinh Trắc Học
 | | |
 |---|---|
 | **Actor** | Người dùng |
-| **Mô tả** | Mở khóa ứng dụng bằng PIN 4-6 số |
+| **Mô tả** | Mở khóa ứng dụng bằng PIN 4 số hoặc Vân tay/Khuôn mặt |
 | **Precondition** | App đã được cài đặt |
-| **Flow chính** | 1. Mở app → Splash Screen<br>2. Kiểm tra PIN đã đặt chưa<br>3a. Chưa → Màn hình tạo PIN mới (nhập 2 lần)<br>3b. Rồi → Màn hình nhập PIN<br>4. Xác thực → Vào Dashboard |
-| **Flow phụ** | Nhập sai PIN 3 lần → Hiển thị thông báo chờ 30s |
+| **Flow chính** | 1. Mở app → Splash Screen<br>2. Kiểm tra PIN đã đặt chưa<br>3a. Chưa → Màn hình tạo PIN mới (nhập 2 lần)<br>3b. Rồi → Màn hình nhập PIN<br>4a. Nếu Biometric đã bật → Tự động popup quét vân tay/khuôn mặt<br>4b. Xác thực thành công → Vào Dashboard<br>4c. Bấm "Dùng mã PIN" → Fallback nhập PIN thủ công |
+| **Flow phụ** | Icon vân tay trên bàn phím số để gọi lại BiometricPrompt |
 | **Postcondition** | Người dùng truy cập được Dashboard |
 
 ### 🏠 UC-02: Xem Dashboard
@@ -358,12 +364,13 @@ try {
 | **Tên file** | `BaoCao_TaiChinh_YYYY-MM-DD_HHmmss.csv` |
 | **Cột CSV** | STT, Ngày, Loại, Hủ quỹ, Danh mục, Số tiền, Ghi chú |
 
-### 🎯 UC-10: Mục Tiêu Tiết Kiệm
+### 🎯 UC-10: Mục Tiêu Tiết Kiệm (Độc lập)
 | | |
 |---|---|
 | **Actor** | Người dùng |
-| **Mô tả** | Đặt mục tiêu tiết kiệm cho hủ |
-| **Flow chính** | 1. Chi tiết hủ → Đặt mục tiêu<br>2. Nhập: Tên mục tiêu, Số tiền, Ngày hoàn thành dự kiến<br>3. Tracking tiến độ (progress bar + %) |
+| **Mô tả** | Quản lý mục tiêu tiết kiệm độc lập (không gắn với hủ) |
+| **Flow chính** | 1. Profile → Mục tiêu tiết kiệm (hoặc Carousel trên Home)<br>2. FAB (+) → Nhập: Tên, Số tiền mục tiêu, Deadline, Chọn icon + màu<br>3. Xem chi tiết → Progress bar gradient + % hoàn thành<br>4. Đóng góp → Nhập số tiền + ghi chú → Lịch sử đóng góp<br>5. Hoàn thành → Badge + Confetti animation |
+| **Business Rule** | Mỗi mục tiêu có bảng GOAL_CONTRIBUTIONS riêng ghi lại lịch sử |
 
 ### 🔄 UC-11: Giao Dịch Định Kỳ
 | | |
@@ -375,7 +382,18 @@ try {
 ### 🌙 UC-12: Dark Mode
 | | |
 |---|---|
-| **Flow chính** | Profile → Cài đặt → Toggle Dark Mode<br>App áp dụng theme tối ngay lập tức |
+| **Actor** | Người dùng |
+| **Mô tả** | Chuyển đổi giao diện sáng/tối toàn bộ ứng dụng |
+| **Flow chính** | 1. Profile → Toggle Dark Mode<br>2. App áp dụng theme tối ngay lập tức<br>3. Trạng thái được lưu vào SharedPreferences<br>4. Khi khởi động lại app → Khôi phục đúng theme (không bị nháy sáng) |
+| **Kỹ thuật** | `values-night/colors.xml` (12 màu) + `values-night/themes.xml` + `FinanceManagerApp` restore |
+
+### 🔒 UC-13: Mở Khóa Sinh Trắc Học
+| | |
+|---|---|
+| **Actor** | Người dùng |
+| **Mô tả** | Bật/tắt xác thực bằng vân tay hoặc khuôn mặt |
+| **Flow chính** | 1. Profile → Toggle "Mở khóa sinh trắc học"<br>2. Nếu thiết bị không hỗ trợ → Switch bị disable + thông báo<br>3. Nếu hỗ trợ + đã bật → Khi mở app, tự động popup BiometricPrompt<br>4. Quét thành công → Vào app, bỏ qua PIN<br>5. Hủy / Lỗi → Fallback nhập PIN thủ công |
+| **Thư viện** | `androidx.biometric` (BiometricPrompt + BiometricManager) |
 
 ---
 
@@ -498,37 +516,38 @@ CREATE TABLE RECURRING_TRANSACTIONS (
 
 ## Tiến Độ Phát Triển
 
-### Phase 1: Core Foundation 🔴
+### Phase 1: Core Foundation ✅
 - [x] SplashActivity + animation
-- [x] PinLockActivity (tạo/xác thực PIN, SharedPreferences)
+- [x] PinLockActivity (tạo/xác thực PIN 4 số, SHA-256 hash, SharedPreferences)
 - [x] MainActivity + Bottom Navigation (4 tabs)
 - [x] HomeFragment – Dashboard tổng quan
 - [x] PotsFragment + PotAdapter – Danh sách hủ
-- [x] AddPotActivity/Dialog – Tạo hủ mới
-- [x] PotDetailActivity – Chi tiết hủ
-- [x] AddTransactionActivity – Thêm giao dịch
+- [x] AddPotDialog – Tạo hủ mới (chọn màu + icon + preview)
+- [x] PotDetailActivity – Chi tiết hủ (gradient header + progress bar)
+- [x] AddTransactionActivity – Thêm giao dịch (category picker + date picker)
 - [x] TransactionAdapter – Hiển thị giao dịch
-- [x] DBManager mở rộng – CRUD đầy đủ
-- [x] UI/UX: layouts, colors, strings (I18N)
+- [x] DBManager Singleton – CRUD đầy đủ
+- [x] UI/UX: layouts, colors, strings (I18N: Tiếng Việt + Tiếng Anh)
 
 ### Phase 2: Enhanced Features ✅
-- [x] Model Category + bảng CATEGORIES + seed data
+- [x] Model Category + bảng CATEGORIES + seed data (12 danh mục mặc định)
 - [x] TransactionsFragment – Lịch sử, filter, search
 - [x] StatisticsActivity – Biểu đồ PieChart (MPAndroidChart)
-- [x] Cảnh báo ngân sách (BudgetAlertDialog siêu đẹp + System Notification)
+- [x] Cảnh báo ngân sách (BudgetAlertDialog + System Notification)
 - [x] Sửa/Xóa giao dịch + hoàn lại balance
-- [x] Chuyển tiền giữa các hủ (Speed Dial FAB + TransferDialog + logic kế toán kép)
+- [x] Chuyển tiền giữa các hủ (TransferDialog + logic kế toán kép)
 - [x] Empty states cao cấp (Reusable layout + Emoji icons + CTA buttons)
 - [x] Animations & transitions (Slide, Fade, Bounce)
-- [x] CustomToast (Thay thế Toast mặc định bằng toast bo tròn có icon trạng thái)
-- [x] NotificationHelper (Quản lý Notification Channel + Budget alerts)
+- [x] CustomToast (Toast bo tròn có icon trạng thái: Success/Error/Warning)
+- [x] NotificationHelper (Notification Channel + Budget alerts)
 - [x] ProfileFragment – Toggle bật/tắt cảnh báo ngân sách
 
-### Phase 3: Advanced Features 🟢
-- [x] Mục tiêu tiết kiệm (Plan A – Độc lập, Carousel trên Home)
-- [x] Giao dịch định kỳ (Recurring Transactions + WorkManager)
-- [x] Dark Mode toggle (lưu SharedPreferences + FinanceManagerApp restore)
-- [x] ExchangeRateAPI – Tỷ giá ngoại tệ (OkHttp + Gson, cache offline 24h)
-- [ ] Export báo cáo CSV
-- [ ] Biometric authentication (Fingerprint)
-- [ ] Testing & Performance optimization
+### Phase 3: Advanced Features ✅
+- [x] Mục tiêu tiết kiệm độc lập (SavingsGoalsActivity + GoalDetailActivity + Carousel Home)
+- [x] Giao dịch định kỳ (RecurringTransactionsActivity + WorkManager 24h)
+- [x] Tỷ giá ngoại tệ trực tuyến (ExchangeRateActivity + OkHttp + Gson, cache 24h)
+- [x] Xuất báo cáo CSV (CSVExportHelper + FileProvider + Share Intent)
+- [x] Dark Mode toàn diện (values-night/colors.xml + themes.xml, 0 hardcoded colors)
+- [x] Biometric authentication (BiometricPrompt + BiometricManager + PIN fallback)
+- [x] I18N audit – 142+ strings khớp 100% giữa Tiếng Việt & Tiếng Anh
+- [x] Database v6 (7 bảng: POTS, TRANSACTIONS, CATEGORIES, USER_SETTINGS, SAVINGS_GOALS, GOAL_CONTRIBUTIONS, RECURRING_TRANSACTIONS)

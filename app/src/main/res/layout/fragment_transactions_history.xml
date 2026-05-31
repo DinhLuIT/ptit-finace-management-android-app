@@ -18,7 +18,7 @@
         app:boxCornerRadiusBottomEnd="16dp"
         app:boxStrokeWidth="0dp"
         app:boxStrokeWidthFocused="0dp"
-        app:boxBackgroundColor="#E8F5E9"
+        app:boxBackgroundColor="@color/color_search_bg"
         app:hintEnabled="false"
         app:startIconDrawable="@drawable/ic_search"
         app:startIconTint="@color/color_primary">

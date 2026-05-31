@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+        Dark Mode Color Overrides.
+        Chỉ override các màu cần thay đổi khi chuyển sang nền tối.
+        Các màu không khai báo ở đây sẽ kế thừa từ values/colors.xml
+        (brand colors, pot colors, income/expense... giữ nguyên).
+    -->
+
+    <!-- Background & Surface -->
+    <color name="color_background">#121212</color>
+    <color name="color_surface">#1E1E1E</color>
+    <color name="color_surface_variant">#2C2C2C</color>
+    <color name="color_card">#1E1E1E</color>
+
+    <!-- Text -->
+    <color name="color_text_primary">#E8E8E8</color>
+    <color name="color_text_secondary">#B0B0B0</color>
+    <color name="color_text_hint">#666666</color>
+
+    <!-- Divider & Misc -->
+    <color name="color_divider">#333333</color>
+    <color name="color_pin_dot_empty">#444444</color>
+
+    <!-- Search Box / Tab Background (dark variant) -->
+    <color name="color_search_bg">#1A4CAF50</color>
+
+    <!-- Progress Track (dark variant) -->
+    <color name="color_progress_track">#1A4CAF50</color>
+</resources>
