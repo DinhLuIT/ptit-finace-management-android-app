@@ -8,6 +8,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.animation.ValueAnimator;
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -41,6 +45,11 @@ public class HomeFragment extends Fragment {
     private TextView textViewTotalBalance, textViewMonthlyIncome, textViewMonthlyExpense;
     private TextView textViewViewAll;
     private RecyclerView recyclerViewRecentTransactions;
+    private ImageView ivToggleBalance;
+
+    private boolean isBalanceHidden = true;
+    private static final String PREF_NAME = "finance_prefs";
+    private static final String KEY_BALANCE_HIDDEN = "is_balance_hidden";
 
     // Empty State views
     private View emptyStateContainer;
@@ -95,6 +104,10 @@ public class HomeFragment extends Fragment {
         textViewMonthlyExpense = view.findViewById(R.id.tv_monthly_expense);
         textViewViewAll = view.findViewById(R.id.tv_view_all);
         recyclerViewRecentTransactions = view.findViewById(R.id.rv_recent_transactions);
+        ivToggleBalance = view.findViewById(R.id.iv_toggle_balance);
+
+        SharedPreferences prefs = requireContext().getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
+        isBalanceHidden = prefs.getBoolean(KEY_BALANCE_HIDDEN, true);
 
         // Empty State – sử dụng layout tái sử dụng
         emptyStateContainer = view.findViewById(R.id.include_empty_state);
@@ -122,6 +135,16 @@ public class HomeFragment extends Fragment {
     }
 
     private void initListeners() {
+        // Toggle ẩn/hiện số dư
+        ivToggleBalance.setOnClickListener(v -> {
+            isBalanceHidden = !isBalanceHidden;
+            requireContext().getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
+                    .edit().putBoolean(KEY_BALANCE_HIDDEN, isBalanceHidden).apply();
+            
+            // Cập nhật giao diện ngay lập tức
+            loadBalanceOnly();
+        });
+
         // FAB chính: Bấm để mở/đóng Speed Dial menu
         floatingActionButtonMain.setOnClickListener(buttonView -> toggleFabMenu());
 
@@ -288,9 +311,7 @@ public class HomeFragment extends Fragment {
     // =============================================
 
     private void loadData() {
-        // Tổng số dư
-        double totalBalance = databaseManager.getTotalBalance();
-        textViewTotalBalance.setText(CurrencyFormatter.format(totalBalance));
+        loadBalanceOnly();
 
         // Thu/Chi tháng này
         int month = DateUtils.getCurrentMonth();
@@ -317,6 +338,21 @@ public class HomeFragment extends Fragment {
 
         // Load Savings Goals carousel
         loadGoals();
+    }
+
+    /**
+     * Chỉ tải và cập nhật số dư, có ẩn/hiện.
+     */
+    private void loadBalanceOnly() {
+        double totalBalance = databaseManager.getTotalBalance();
+
+        if (isBalanceHidden) {
+            ivToggleBalance.setImageResource(R.drawable.ic_visibility_off);
+            textViewTotalBalance.setText("******");
+        } else {
+            ivToggleBalance.setImageResource(R.drawable.ic_visibility);
+            textViewTotalBalance.setText(CurrencyFormatter.format(totalBalance));
+        }
     }
 
     // =============================================

@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -30,22 +31,7 @@ public class CategoryExpenseAdapter
     private final Context context;
     private final int[] chartColors;
 
-    // Map icon name (từ DB) sang emoji để hiển thị
-    private static final Map<String, String> ICON_MAP = new HashMap<>();
-    static {
-        ICON_MAP.put("ic_food", "🍜");
-        ICON_MAP.put("ic_housing", "🏠");
-        ICON_MAP.put("ic_transport", "🚗");
-        ICON_MAP.put("ic_entertainment", "🎮");
-        ICON_MAP.put("ic_education", "📚");
-        ICON_MAP.put("ic_health", "💊");
-        ICON_MAP.put("ic_shopping", "🛍");
-        ICON_MAP.put("ic_savings", "💰");
-        ICON_MAP.put("ic_salary", "💵");
-        ICON_MAP.put("ic_gift", "🎁");
-        ICON_MAP.put("ic_other", "📦");
-        ICON_MAP.put("ic_transfer", "🔄");
-    }
+    // Không cần dùng ICON_MAP nữa vì đã dùng VectorDrawable chung qua IconMapper
 
     public CategoryExpenseAdapter(List<CategoryExpense> categoryExpenseList,
                                   Context context, int[] chartColors) {
@@ -71,10 +57,9 @@ public class CategoryExpenseAdapter
         GradientDrawable colorBarBackground = (GradientDrawable) holder.viewColorDot.getBackground();
         colorBarBackground.setColor(chartColors[colorIndex]);
 
-        // Icon danh mục (chuyển từ icon name sang emoji)
-        String iconName = categoryExpense.getCategoryIcon();
-        String emoji = ICON_MAP.getOrDefault(iconName, "📦");
-        holder.textViewCategoryIcon.setText(emoji);
+        // Icon danh mục
+        holder.textViewCategoryIcon.setImageResource(
+                com.ptithcm.finacemanager.utils.IconMapper.getIconResource(context, categoryExpense.getCategoryIcon()));
 
         // Tên danh mục (resolve từ resource key sang tên hiển thị theo ngôn ngữ)
         String categoryName = categoryExpense.getCategoryName();
@@ -110,7 +95,7 @@ public class CategoryExpenseAdapter
 
     static class CategoryExpenseViewHolder extends RecyclerView.ViewHolder {
         View viewColorDot;
-        TextView textViewCategoryIcon;
+        ImageView textViewCategoryIcon;
         TextView textViewCategoryName;
         TextView textViewCategoryPercentage;
         TextView textViewCategoryAmount;

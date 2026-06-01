@@ -19,12 +19,13 @@
         android:padding="@dimen/spacing_md">
 
         <!-- Category Icon -->
-        <TextView
+        <ImageView
             android:id="@+id/tv_category_icon"
             android:layout_width="44dp"
             android:layout_height="44dp"
             android:gravity="center"
-            android:textSize="22sp"
+            android:padding="10dp"
+            app:tint="@color/white"
             android:background="@drawable/bg_icon_circle" />
 
         <LinearLayout

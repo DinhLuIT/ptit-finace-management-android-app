@@ -20,6 +20,8 @@ import com.ptithcm.finacemanager.model.Pot;
 import com.ptithcm.finacemanager.utils.CurrencyFormatter;
 import com.ptithcm.finacemanager.utils.CustomToast;
 import com.ptithcm.finacemanager.utils.NotificationHelper;
+import com.ptithcm.finacemanager.adapter.PotDropdownAdapter;
+import android.os.SystemClock;
 
 import java.util.List;
 
@@ -45,6 +47,7 @@ public class TransferDialog extends DialogFragment {
 
     private int selectedSourcePotId = -1;
     private int selectedDestinationPotId = -1;
+    private long lastClickTime = 0;
 
     private OnTransferCompleteListener transferCompleteListener;
 
@@ -102,24 +105,15 @@ public class TransferDialog extends DialogFragment {
     }
 
     /**
-     * Nạp danh sách hủ đang hoạt động vào cả 2 dropdown.
+     * Nạp danh sách hủ đang hoạt động vào cả 2 dropdown bằng custom adapter.
      */
     private void loadPotData() {
         activePotList = databaseManager.getAllActivePots();
 
-        // Hiển thị tên hủ kèm số dư để người dùng dễ quyết định
-        String[] potDisplayNames = new String[activePotList.size()];
-        for (int index = 0; index < activePotList.size(); index++) {
-            Pot pot = activePotList.get(index);
-            potDisplayNames[index] = pot.getName() + " (" + CurrencyFormatter.format(pot.getBalance()) + ")";
-        }
-
-        ArrayAdapter<String> sourcePotAdapter = new ArrayAdapter<>(requireContext(),
-                android.R.layout.simple_dropdown_item_1line, potDisplayNames);
+        PotDropdownAdapter sourcePotAdapter = new PotDropdownAdapter(requireContext(), activePotList, true);
         autoCompleteSourcePot.setAdapter(sourcePotAdapter);
 
-        ArrayAdapter<String> destinationPotAdapter = new ArrayAdapter<>(requireContext(),
-                android.R.layout.simple_dropdown_item_1line, potDisplayNames);
+        PotDropdownAdapter destinationPotAdapter = new PotDropdownAdapter(requireContext(), activePotList, true);
         autoCompleteDestinationPot.setAdapter(destinationPotAdapter);
     }
 
@@ -151,6 +145,10 @@ public class TransferDialog extends DialogFragment {
      * Xác thực đầu vào và thực hiện chuyển tiền.
      */
     private void executeTransfer() {
+        // Chống double click
+        if (SystemClock.elapsedRealtime() - lastClickTime < 1000) return;
+        lastClickTime = SystemClock.elapsedRealtime();
+
         // Reset lỗi
         textInputLayoutSourcePot.setError(null);
         textInputLayoutDestinationPot.setError(null);

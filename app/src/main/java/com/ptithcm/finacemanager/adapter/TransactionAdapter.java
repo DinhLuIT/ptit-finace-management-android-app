@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
@@ -66,7 +67,8 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
 
     class TransactionViewHolder extends RecyclerView.ViewHolder {
         private final View viewCategoryBackground;
-        private final TextView textViewCategoryIcon, textViewTransactionCategory, textViewTransactionNote, textViewTransactionAmount, textViewTransactionDate;
+        private final TextView textViewTransactionCategory, textViewTransactionNote, textViewTransactionAmount, textViewTransactionDate;
+        private final ImageView textViewCategoryIcon;
 
         TransactionViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -80,12 +82,12 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
 
         void bind(Transaction transaction) {
             // Category icon (emoji) – dùng IconMapper utility
-            textViewCategoryIcon.setText(IconMapper.toEmoji(transaction.getCategoryIcon()));
+            textViewCategoryIcon.setImageResource(IconMapper.getIconResource(context, transaction.getCategoryIcon()));
 
-            // Màu nền icon theo loại giao dịch
-            int backgroundColor = transaction.isIncome()
-                    ? ContextCompat.getColor(context, R.color.color_income)
-                    : ContextCompat.getColor(context, R.color.color_expense);
+            // Màu nền icon đa dạng dựa theo Category ID để giao diện không bị đơn điệu
+            int colorIndex = Math.abs(transaction.getCategoryId()) % Constants.POT_COLORS.length;
+            int backgroundColor = Color.parseColor(Constants.POT_COLORS[colorIndex]);
+            
             GradientDrawable backgroundDrawable = new GradientDrawable();
             backgroundDrawable.setShape(GradientDrawable.OVAL);
             backgroundDrawable.setColor(backgroundColor);

@@ -551,3 +551,12 @@ CREATE TABLE RECURRING_TRANSACTIONS (
 - [x] Biometric authentication (BiometricPrompt + BiometricManager + PIN fallback)
 - [x] I18N audit – 142+ strings khớp 100% giữa Tiếng Việt & Tiếng Anh
 - [x] Database v6 (7 bảng: POTS, TRANSACTIONS, CATEGORIES, USER_SETTINGS, SAVINGS_GOALS, GOAL_CONTRIBUTIONS, RECURRING_TRANSACTIONS)
+
+### Phase 4: Premium UI/UX & Validation ✅
+- [x] Cải tiến giao diện Trang Chủ (Gradient Home Card, bóng đổ mượt mà)
+- [x] Chế độ Riêng tư (Ẩn/hiện tổng số dư bằng icon con mắt)
+- [x] Hệ thống Vector Icon (Loại bỏ Emoji lỗi thời, thay bằng 12 icon Material Design sắc nét)
+- [x] Giao diện Nhập Liệu Nâng Cao (Tích hợp Spinner Custom cho Hũ và Danh mục hiển thị Icon + Màu sắc)
+- [x] Inline Error Validation (Báo lỗi màu đỏ trực tiếp qua TextInputLayout)
+- [x] Chống Double-click (Ngăn chặn tạo 2 giao dịch trùng lặp khi bấm nhanh bằng SystemClock)
+- [x] Cập nhật Logic Số Dư (Cho phép chi tiêu hũ bị âm linh hoạt theo thực tế)

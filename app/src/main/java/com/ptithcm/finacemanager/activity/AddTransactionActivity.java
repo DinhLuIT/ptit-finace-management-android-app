@@ -2,6 +2,7 @@ package com.ptithcm.finacemanager.activity;
 
 import android.app.DatePickerDialog;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.TextView;
@@ -14,6 +15,8 @@ import com.google.android.material.button.MaterialButtonToggleGroup;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.ptithcm.finacemanager.R;
+import com.ptithcm.finacemanager.adapter.PotDropdownAdapter;
+import com.ptithcm.finacemanager.adapter.CategoryDropdownAdapter;
 import com.ptithcm.finacemanager.database.DBManager;
 import com.ptithcm.finacemanager.model.Category;
 import com.ptithcm.finacemanager.model.Pot;
@@ -46,6 +49,8 @@ public class AddTransactionActivity extends AppCompatActivity {
 
     // Nếu mở từ PotDetail, nhận potId để tự chọn
     private int preselectedPotId = -1;
+
+    private long lastClickTime = 0;
 
     // Nếu mở để sửa giao dịch
     private int editTransactionId = -1;
@@ -126,12 +131,7 @@ public class AddTransactionActivity extends AppCompatActivity {
     private void loadData() {
         // Load pots
         potList = dbManager.getAllActivePots();
-        String[] potNames = new String[potList.size()];
-        for (int i = 0; i < potList.size(); i++) {
-            potNames[i] = potList.get(i).getName();
-        }
-        ArrayAdapter<String> potAdapter = new ArrayAdapter<>(this,
-                android.R.layout.simple_dropdown_item_1line, potNames);
+        PotDropdownAdapter potAdapter = new PotDropdownAdapter(this, potList, true);
         spPot.setAdapter(potAdapter);
 
         // Tự chọn pot nếu mở từ PotDetail
@@ -151,12 +151,7 @@ public class AddTransactionActivity extends AppCompatActivity {
 
     private void loadCategories() {
         categoryList = dbManager.getCategoriesByType(currentType);
-        String[] catNames = new String[categoryList.size()];
-        for (int i = 0; i < categoryList.size(); i++) {
-            catNames[i] = categoryList.get(i).getLocalizedName(this);
-        }
-        ArrayAdapter<String> catAdapter = new ArrayAdapter<>(this,
-                android.R.layout.simple_dropdown_item_1line, catNames);
+        CategoryDropdownAdapter catAdapter = new CategoryDropdownAdapter(this, categoryList);
         spCategory.setAdapter(catAdapter);
 
         // Reset selection nếu không phải đang set up Edit Mode lần đầu
@@ -233,6 +228,10 @@ public class AddTransactionActivity extends AppCompatActivity {
     }
 
     private void saveTransaction() {
+        // Chống double click
+        if (SystemClock.elapsedRealtime() - lastClickTime < 1000) return;
+        lastClickTime = SystemClock.elapsedRealtime();
+
         // Validate amount
         String amountStr = etAmount.getText() != null ? etAmount.getText().toString().trim() : "";
         double amount;

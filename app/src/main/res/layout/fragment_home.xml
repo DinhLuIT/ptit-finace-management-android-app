@@ -22,20 +22,38 @@
                 android:layout_margin="@dimen/spacing_md"
                 app:cardCornerRadius="@dimen/card_radius"
                 app:cardElevation="@dimen/card_elevation"
-                app:cardBackgroundColor="@color/color_primary">
+                app:strokeWidth="0dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
+                    android:background="@drawable/bg_home_balance_card"
                     android:padding="@dimen/spacing_lg">
 
-                    <TextView
-                        android:layout_width="wrap_content"
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="@string/label_total_balance"
-                        android:textColor="@color/color_text_on_primary_secondary"
-                        android:textSize="@dimen/text_body" />
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+                        
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/label_total_balance"
+                            android:textColor="@color/color_text_on_primary_secondary"
+                            android:textSize="@dimen/text_body" />
+
+                        <ImageView
+                            android:id="@+id/iv_toggle_balance"
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:layout_marginStart="@dimen/spacing_sm"
+                            android:src="@drawable/ic_visibility"
+                            android:background="?attr/selectableItemBackgroundBorderless"
+                            android:clickable="true"
+                            android:focusable="true"/>
+                    </LinearLayout>
 
                     <TextView
                         android:id="@+id/tv_total_balance"
