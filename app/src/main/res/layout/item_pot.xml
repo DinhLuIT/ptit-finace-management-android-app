@@ -1,13 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginHorizontal="@dimen/spacing_md"
     android:layout_marginVertical="6dp"
-    app:cardCornerRadius="16dp"
-    app:cardElevation="4dp"
+    app:cardCornerRadius="20dp"
+    app:cardElevation="2dp"
     app:strokeWidth="0dp"
+    app:cardBackgroundColor="?attr/colorSurface"
     android:foreground="?attr/selectableItemBackground"
     android:clickable="true"
     android:focusable="true">
@@ -15,114 +17,117 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:orientation="vertical"
+        android:padding="16dp">
 
-        <!-- Color Strip bên trái -->
-        <View
-            android:id="@+id/view_pot_color"
-            android:layout_width="6dp"
-            android:layout_height="match_parent" />
-
+        <!-- Row 1: Header (Icon + Name + Balance) -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="@dimen/spacing_md">
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
 
-            <!-- Row 1: Icon + Name + Balance -->
+            <!-- Avatar Container -->
+            <FrameLayout
+                android:layout_width="48dp"
+                android:layout_height="48dp">
+
+                <View
+                    android:id="@+id/view_icon_bg"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/bg_circle" />
+
+                <TextView
+                    android:id="@+id/tv_pot_letter"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:textColor="@color/white"
+                    android:textSize="22sp"
+                    android:textStyle="bold"
+                    android:visibility="gone"
+                    tools:text="T"
+                    tools:visibility="visible" />
+
+                <ImageView
+                    android:id="@+id/iv_pot_icon"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="centerInside"
+                    android:padding="12dp"
+                    android:visibility="gone"
+                    tools:src="@drawable/ic_savings" />
+            </FrameLayout>
+
+            <!-- Name & Budget -->
             <LinearLayout
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
+                android:layout_marginStart="12dp"
+                android:layout_weight="1"
+                android:orientation="vertical">
 
-                <!-- Emoji icon in colored circle -->
-                <FrameLayout
-                    android:layout_width="44dp"
-                    android:layout_height="44dp">
-
-                    <View
-                        android:id="@+id/view_icon_bg"
-                        android:layout_width="44dp"
-                        android:layout_height="44dp" />
-
-                    <TextView
-                        android:id="@+id/tv_pot_icon"
-                        android:layout_width="44dp"
-                        android:layout_height="44dp"
-                        android:gravity="center"
-                        android:textSize="20sp" />
-                </FrameLayout>
-
-                <!-- Name + Budget -->
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="12dp"
-                    android:layout_weight="1"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:id="@+id/tv_pot_name"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textColor="@color/color_text_primary"
-                        android:textSize="16sp"
-                        android:textStyle="bold"
-                        android:maxLines="1"
-                        android:ellipsize="end" />
-
-                    <TextView
-                        android:id="@+id/tv_pot_budget"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="2dp"
-                        android:textColor="@color/color_text_secondary"
-                        android:textSize="12sp" />
-                </LinearLayout>
-
-                <!-- Balance aligned right -->
-                <LinearLayout
+                <TextView
+                    android:id="@+id/tv_pot_name"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:gravity="end"
-                    android:orientation="vertical">
+                    android:textColor="@color/color_text_primary"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:maxLines="1"
+                    android:ellipsize="end"
+                    tools:text="Tích lũy &amp; Tiết kiệm" />
 
-                    <TextView
-                        android:id="@+id/tv_pot_balance"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textColor="@color/color_text_primary"
-                        android:textSize="16sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:id="@+id/tv_balance_label"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="2dp"
-                        android:text="@string/label_remaining"
-                        android:textColor="@color/color_text_hint"
-                        android:textSize="11sp" />
-                </LinearLayout>
+                <TextView
+                    android:id="@+id/tv_pot_budget"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:textColor="@color/color_text_secondary"
+                    android:textSize="13sp"
+                    tools:text="Ngân sách: 5,000,000 ₫" />
             </LinearLayout>
 
-            <!-- Row 2: Progress Bar (rounded, thicker) -->
-            <ProgressBar
-                android:id="@+id/pb_budget"
-                style="?android:attr/progressBarStyleHorizontal"
-                android:layout_width="match_parent"
-                android:layout_height="10dp"
-                android:layout_marginTop="14dp"
-                android:max="100"
-                android:progressDrawable="@drawable/bg_progress_bar_rounded" />
+            <!-- Balance -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="end"
+                android:orientation="vertical">
 
-            <!-- Row 3: Percentage + Remaining -->
+                <TextView
+                    android:id="@+id/tv_pot_balance"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/color_text_primary"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    tools:text="2,376,877 ₫" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:text="@string/label_balance"
+                    android:textColor="@color/color_text_hint"
+                    android:textSize="12sp" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Row 2: Progress Area -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:orientation="vertical">
+
+            <!-- Information above progress bar -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:layout_marginBottom="6dp">
 
                 <TextView
                     android:id="@+id/tv_pot_percentage"
@@ -130,14 +135,30 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:textColor="@color/color_text_secondary"
-                    android:textSize="12sp" />
+                    android:textSize="13sp"
+                    android:textStyle="bold"
+                    tools:text="Đã chi 52%" />
 
                 <TextView
                     android:id="@+id/tv_pot_remaining"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="12sp" />
+                    android:textSize="13sp"
+                    android:textStyle="bold"
+                    tools:text="Còn lại: 2,623,123 ₫" />
             </LinearLayout>
+
+            <!-- Modern Linear Progress Indicator -->
+            <com.google.android.material.progressindicator.LinearProgressIndicator
+                android:id="@+id/pb_budget"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:trackThickness="8dp"
+                app:trackCornerRadius="4dp"
+                android:max="100"
+                tools:progress="52"
+                app:trackColor="#E0E0E0" />
         </LinearLayout>
+
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

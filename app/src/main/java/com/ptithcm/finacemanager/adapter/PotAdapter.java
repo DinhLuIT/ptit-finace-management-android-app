@@ -7,10 +7,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-
+import android.widget.ImageView;
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
+import com.google.android.material.progressindicator.LinearProgressIndicator;
 
 import com.ptithcm.finacemanager.R;
 import com.ptithcm.finacemanager.model.Pot;
@@ -59,16 +60,17 @@ public class PotAdapter extends RecyclerView.Adapter<PotAdapter.PotViewHolder> {
     }
 
     class PotViewHolder extends RecyclerView.ViewHolder {
-        private final View viewPotColor, viewIconBg;
-        private final TextView tvPotIcon, tvPotName, tvPotBudget, tvPotBalance;
+        private final View viewIconBg;
+        private final TextView tvPotLetter, tvPotName, tvPotBudget, tvPotBalance;
+        private final ImageView ivPotIcon;
         private final TextView tvPotPercentage, tvPotRemaining;
-        private final ProgressBar pbBudget;
+        private final LinearProgressIndicator pbBudget;
 
         PotViewHolder(@NonNull View itemView) {
             super(itemView);
-            viewPotColor = itemView.findViewById(R.id.view_pot_color);
             viewIconBg = itemView.findViewById(R.id.view_icon_bg);
-            tvPotIcon = itemView.findViewById(R.id.tv_pot_icon);
+            tvPotLetter = itemView.findViewById(R.id.tv_pot_letter);
+            ivPotIcon = itemView.findViewById(R.id.iv_pot_icon);
             tvPotName = itemView.findViewById(R.id.tv_pot_name);
             tvPotBudget = itemView.findViewById(R.id.tv_pot_budget);
             tvPotBalance = itemView.findViewById(R.id.tv_pot_balance);
@@ -86,61 +88,60 @@ public class PotAdapter extends RecyclerView.Adapter<PotAdapter.PotViewHolder> {
             // === 2. Số dư ===
             tvPotBalance.setText(CurrencyFormatter.format(pot.getBalance()));
 
-            // === 3. Màu pot (color strip bên trái) ===
+            // === 3. Màu pot ===
             int potColor;
             try {
                 potColor = Color.parseColor(pot.getColor());
             } catch (Exception e) {
                 potColor = Color.parseColor("#4CAF50");
             }
-            viewPotColor.setBackgroundColor(potColor);
 
-            // === 4. Icon emoji trong vòng tròn nhạt (từ DB) ===
-            String emoji = pot.getIcon();
-            if (emoji == null || emoji.isEmpty() || emoji.equals("ic_default")) {
-                emoji = Constants.DEFAULT_POT_ICON;
-            }
-            tvPotIcon.setText(emoji);
-
-            // Tạo background tròn với màu nhạt (alpha 20%)
+            // === 4. Icon & Avatar (Tinted Background) ===
+            // Background vòng tròn 15% opacity
             GradientDrawable iconBg = new GradientDrawable();
             iconBg.setShape(GradientDrawable.OVAL);
-            int alphaColor = Color.argb(30,
+            int alphaColor = Color.argb(38, // ~15% opacity
                     Color.red(potColor), Color.green(potColor), Color.blue(potColor));
             iconBg.setColor(alphaColor);
             viewIconBg.setBackground(iconBg);
 
+            String rawIcon = pot.getIcon();
+            boolean isVector = com.ptithcm.finacemanager.utils.IconMapper.getIconResource(itemView.getContext(), rawIcon) != com.ptithcm.finacemanager.R.drawable.ic_other;
+            // Nếu rawIcon là cat_food, etc.. nó sẽ tìm thấy vector. Nếu không nó là emoji hoặc rỗng.
+
+            if (isVector) {
+                tvPotLetter.setVisibility(View.GONE);
+                ivPotIcon.setVisibility(View.VISIBLE);
+                ivPotIcon.setImageResource(com.ptithcm.finacemanager.utils.IconMapper.getIconResource(itemView.getContext(), rawIcon));
+                ivPotIcon.setColorFilter(potColor); // Vector icon mang màu 100% của hũ
+            } else {
+                // Letter Avatar Fallback
+                ivPotIcon.setVisibility(View.GONE);
+                tvPotLetter.setVisibility(View.VISIBLE);
+                String firstLetter = "P";
+                if (pot.getName() != null && !pot.getName().trim().isEmpty()) {
+                    firstLetter = pot.getName().trim().substring(0, 1).toUpperCase();
+                }
+                tvPotLetter.setText(firstLetter);
+                tvPotLetter.setTextColor(potColor); // Chữ mang màu 100% của hũ
+            }
+
             // === 5. Progress Bar ===
             int percentage = pot.getBudgetPercentage();
             pbBudget.setProgress(percentage);
-
-            // Đổi màu progress theo mức ngân sách
-            int progressColor;
-            if (percentage < Constants.BUDGET_WARNING_THRESHOLD * 100) {
-                progressColor = ContextCompat.getColor(itemView.getContext(), R.color.color_budget_safe);
-            } else if (percentage < Constants.BUDGET_DANGER_THRESHOLD * 100) {
-                progressColor = ContextCompat.getColor(itemView.getContext(), R.color.color_budget_warning);
-            } else {
-                progressColor = ContextCompat.getColor(itemView.getContext(), R.color.color_budget_danger);
-            }
-            pbBudget.getProgressDrawable().setColorFilter(
-                    progressColor, android.graphics.PorterDuff.Mode.SRC_IN);
+            pbBudget.setIndicatorColor(potColor); // Thanh chạy màu của Hũ
 
             // === 6. Percentage & Remaining text ===
             String statusLabel;
             if (percentage < Constants.BUDGET_WARNING_THRESHOLD * 100) {
-                statusLabel = "🟢 " + percentage + "% " +
-                        itemView.getContext().getString(R.string.label_spent);
-                tvPotRemaining.setTextColor(ContextCompat.getColor(
-                        itemView.getContext(), R.color.color_budget_safe));
+                statusLabel = percentage + "% " + itemView.getContext().getString(R.string.label_spent);
+                tvPotRemaining.setTextColor(potColor); // Text an toàn có màu của hũ
             } else if (percentage < Constants.BUDGET_DANGER_THRESHOLD * 100) {
-                statusLabel = "🟡 " + percentage + "% " +
-                        itemView.getContext().getString(R.string.label_spent);
+                statusLabel = percentage + "% " + itemView.getContext().getString(R.string.label_spent);
                 tvPotRemaining.setTextColor(ContextCompat.getColor(
                         itemView.getContext(), R.color.color_budget_warning));
             } else {
-                statusLabel = "🔴 " + percentage + "% " +
-                        itemView.getContext().getString(R.string.label_spent);
+                statusLabel = percentage + "% " + itemView.getContext().getString(R.string.label_spent);
                 tvPotRemaining.setTextColor(ContextCompat.getColor(
                         itemView.getContext(), R.color.color_budget_danger));
             }

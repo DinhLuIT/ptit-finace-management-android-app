@@ -68,13 +68,16 @@ public class Constants {
             "#F44336", "#009688", "#E91E63", "#3F51B5"
     };
 
-    // Pot Icons (Emoji)
+    // Pot Icons (Vector)
     public static final String[] POT_ICONS = {
-            "💰", "🍜", "🏠", "🚗", "🎮", "📚", "💊", "🛍",
-            "✈️", "☕", "🎬", "👕", "💡", "🐱", "🎵", "💼"
+            "EMPTY",
+            "ic_savings", "ic_food", "ic_housing", "ic_transport", 
+            "ic_entertainment", "ic_education", "ic_health", "ic_shopping",
+            "ic_gift", "ic_profile", "ic_calendar", "ic_transaction",
+            "ic_swap", "ic_history"
     };
 
-    public static final String DEFAULT_POT_ICON = "💰";
+    public static final String DEFAULT_POT_ICON = "ic_pot";
 
     // Budget Thresholds
     public static final double BUDGET_WARNING_THRESHOLD = 0.6;

@@ -4,10 +4,13 @@ import android.app.Dialog;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.GridLayout;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -16,6 +19,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.ptithcm.finacemanager.R;
@@ -27,13 +31,15 @@ public class AddPotDialog extends DialogFragment {
 
     private TextInputEditText etPotName, etBudgetLimit;
     private TextInputLayout tilPotName, tilBudgetLimit;
-    private LinearLayout llColorPicker;
-    private GridLayout glIconPicker;
+    private TextView tvDialogTitle;
     private View viewPreviewBg;
-    private TextView tvPreviewIcon, tvDialogTitle;
+    private TextView tvPreviewLetter;
+    private ImageView ivPreviewIcon;
+    private GridLayout glIconPicker;
+    private LinearLayout llColorPicker;
 
     private String selectedColor = Constants.POT_COLORS[0];
-    private String selectedIcon = Constants.DEFAULT_POT_ICON;
+    private String selectedIcon = "";
     private OnPotSavedListener listener;
 
     // Edit mode
@@ -48,9 +54,6 @@ public class AddPotDialog extends DialogFragment {
         this.listener = listener;
     }
 
-    /**
-     * Đặt pot để chỉnh sửa. Gọi trước show().
-     */
     public void setEditPot(Pot pot) {
         this.editPot = pot;
         this.isEditMode = true;
@@ -71,31 +74,41 @@ public class AddPotDialog extends DialogFragment {
         etBudgetLimit = view.findViewById(R.id.et_budget_limit);
         tilPotName = view.findViewById(R.id.til_pot_name);
         tilBudgetLimit = view.findViewById(R.id.til_budget_limit);
-        llColorPicker = view.findViewById(R.id.ll_color_picker);
-        glIconPicker = view.findViewById(R.id.gl_icon_picker);
-        viewPreviewBg = view.findViewById(R.id.view_preview_bg);
-        tvPreviewIcon = view.findViewById(R.id.tv_preview_icon);
         tvDialogTitle = view.findViewById(R.id.tv_dialog_title);
+        viewPreviewBg = view.findViewById(R.id.view_preview_bg);
+        tvPreviewLetter = view.findViewById(R.id.tv_preview_letter);
+        ivPreviewIcon = view.findViewById(R.id.iv_preview_icon);
+        glIconPicker = view.findViewById(R.id.gl_icon_picker);
+        llColorPicker = view.findViewById(R.id.ll_color_picker);
 
-        // Nếu edit mode, pre-fill dữ liệu
+        MaterialButton btnCancel = view.findViewById(R.id.btn_cancel);
+        MaterialButton btnSave = view.findViewById(R.id.btn_save);
+
+        etPotName.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                updatePreview();
+            }
+            @Override
+            public void afterTextChanged(Editable s) {}
+        });
+
         if (isEditMode && editPot != null) {
             tvDialogTitle.setText(R.string.title_edit_pot);
             etPotName.setText(editPot.getName());
             etBudgetLimit.setText(String.valueOf((long) editPot.getBudgetLimit()));
             selectedColor = editPot.getColor() != null ? editPot.getColor() : Constants.POT_COLORS[0];
-
-            String icon = editPot.getIcon();
-            if (icon != null && !icon.isEmpty() && !icon.equals("ic_default")) {
-                selectedIcon = icon;
-            }
+            selectedIcon = editPot.getIcon() != null ? editPot.getIcon() : "";
         }
 
         setupIconPicker();
         setupColorPicker();
         updatePreview();
 
-        view.findViewById(R.id.btn_save).setOnClickListener(v -> savePot());
-        view.findViewById(R.id.btn_cancel).setOnClickListener(v -> dismiss());
+        btnSave.setOnClickListener(v -> savePot());
+        btnCancel.setOnClickListener(v -> dismiss());
     }
 
     @Override
@@ -106,48 +119,83 @@ public class AddPotDialog extends DialogFragment {
             dialog.getWindow().setLayout(
                     ViewGroup.LayoutParams.MATCH_PARENT,
                     ViewGroup.LayoutParams.WRAP_CONTENT);
-            dialog.getWindow().setBackgroundDrawableResource(R.drawable.bg_card_rounded);
+            int margin = (int) (16 * getResources().getDisplayMetrics().density);
+            android.graphics.drawable.Drawable bg = androidx.core.content.ContextCompat.getDrawable(requireContext(), R.drawable.bg_card_rounded);
+            dialog.getWindow().setBackgroundDrawable(new android.graphics.drawable.InsetDrawable(bg, margin));
         }
     }
 
-    // ===== ICON PICKER =====
+    // ===== ICON PICKER (VECTOR) =====
     private void setupIconPicker() {
         glIconPicker.removeAllViews();
         float density = getResources().getDisplayMetrics().density;
-        int size = (int) (40 * density);
-        int margin = (int) (4 * density);
+        int size = (int) (44 * density);
+        int padding = (int) (10 * density);
 
-        for (String icon : Constants.POT_ICONS) {
-            TextView iconView = new TextView(requireContext());
-            GridLayout.LayoutParams params = new GridLayout.LayoutParams();
-            params.width = size;
-            params.height = size;
-            params.setMargins(margin, margin, margin, margin);
-            iconView.setLayoutParams(params);
-            iconView.setText(icon);
-            iconView.setTextSize(20);
-            iconView.setGravity(android.view.Gravity.CENTER);
+        int potColor;
+        try {
+            potColor = Color.parseColor(selectedColor);
+        } catch (Exception e) {
+            potColor = Color.parseColor("#4CAF50");
+        }
 
-            if (icon.equals(selectedIcon)) {
-                GradientDrawable selectedBg = new GradientDrawable();
-                selectedBg.setShape(GradientDrawable.OVAL);
-                selectedBg.setColor(Color.parseColor("#E8F5E9"));
-                selectedBg.setStroke((int) (2 * density), Color.parseColor(selectedColor));
-                iconView.setBackground(selectedBg);
+        for (String iconKey : Constants.POT_ICONS) {
+            View iconContainer;
+            
+            if (iconKey.equals("EMPTY")) {
+                TextView tv = new TextView(requireContext());
+                tv.setText("Aa");
+                tv.setTextSize(18f);
+                tv.setTypeface(null, android.graphics.Typeface.BOLD);
+                tv.setGravity(android.view.Gravity.CENTER);
+                if (iconKey.equals(selectedIcon) || selectedIcon.isEmpty()) {
+                    tv.setTextColor(potColor);
+                } else {
+                    tv.setTextColor(Color.parseColor("#9E9E9E"));
+                }
+                iconContainer = tv;
             } else {
-                GradientDrawable normalBg = new GradientDrawable();
-                normalBg.setShape(GradientDrawable.OVAL);
-                normalBg.setColor(Color.parseColor("#F5F5F5"));
-                iconView.setBackground(normalBg);
+                ImageView iv = new ImageView(requireContext());
+                iv.setImageResource(com.ptithcm.finacemanager.utils.IconMapper.getIconResource(requireContext(), iconKey));
+                iv.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
+                iv.setPadding(padding, padding, padding, padding);
+                if (iconKey.equals(selectedIcon)) {
+                    iv.setColorFilter(potColor);
+                } else {
+                    iv.setColorFilter(Color.parseColor("#9E9E9E"));
+                }
+                iconContainer = iv;
             }
 
-            iconView.setOnClickListener(v -> {
-                selectedIcon = icon;
+            GridLayout.LayoutParams params = new GridLayout.LayoutParams();
+            params.width = 0;
+            params.height = size;
+            params.columnSpec = GridLayout.spec(GridLayout.UNDEFINED, 1f);
+            params.setMargins(6, 6, 6, 6);
+            iconContainer.setLayoutParams(params);
+
+            GradientDrawable bgDrawable = new GradientDrawable();
+            bgDrawable.setShape(GradientDrawable.RECTANGLE);
+            bgDrawable.setCornerRadius(14 * density); // Bo góc 14dp tạo hình vuông bo góc mềm mại
+
+            if (iconKey.equals(selectedIcon) || (iconKey.equals("EMPTY") && selectedIcon.isEmpty())) {
+                bgDrawable.setColor(Color.argb(38, Color.red(potColor), Color.green(potColor), Color.blue(potColor)));
+            } else {
+                bgDrawable.setColor(Color.parseColor("#F5F5F5"));
+            }
+            iconContainer.setBackground(bgDrawable);
+
+            iconContainer.setOnClickListener(v -> {
+                if (iconKey.equals("EMPTY")) {
+                    selectedIcon = "";
+                } else {
+                    selectedIcon = iconKey;
+                }
                 setupIconPicker();
                 updatePreview();
             });
 
-            glIconPicker.addView(iconView);
+            glIconPicker.addView(iconContainer);
         }
     }
 
@@ -169,7 +217,7 @@ public class AddPotDialog extends DialogFragment {
             drawable.setColor(Color.parseColor(color));
 
             if (color.equals(selectedColor)) {
-                drawable.setStroke((int) (3 * density), Color.parseColor("#212121"));
+                drawable.setStroke((int) (1.5f * density), Color.parseColor("#212121"));
             }
 
             colorView.setBackground(drawable);
@@ -186,8 +234,6 @@ public class AddPotDialog extends DialogFragment {
 
     // ===== PREVIEW =====
     private void updatePreview() {
-        tvPreviewIcon.setText(selectedIcon);
-
         int potColor;
         try {
             potColor = Color.parseColor(selectedColor);
@@ -195,12 +241,30 @@ public class AddPotDialog extends DialogFragment {
             potColor = Color.parseColor("#4CAF50");
         }
 
+        boolean isVector = !selectedIcon.isEmpty();
+
+        if (isVector) {
+            tvPreviewLetter.setVisibility(View.GONE);
+            ivPreviewIcon.setVisibility(View.VISIBLE);
+            ivPreviewIcon.setImageResource(com.ptithcm.finacemanager.utils.IconMapper.getIconResource(requireContext(), selectedIcon));
+            ivPreviewIcon.setColorFilter(potColor);
+        } else {
+            ivPreviewIcon.setVisibility(View.GONE);
+            tvPreviewLetter.setVisibility(View.VISIBLE);
+            String name = etPotName.getText() != null ? etPotName.getText().toString().trim() : "";
+            String letter = "P";
+            if (!name.isEmpty()) {
+                letter = name.substring(0, 1).toUpperCase();
+            }
+            tvPreviewLetter.setText(letter);
+            tvPreviewLetter.setTextColor(potColor);
+        }
+
         GradientDrawable previewBg = new GradientDrawable();
         previewBg.setShape(GradientDrawable.OVAL);
-        int alphaColor = Color.argb(40,
+        int alphaColor = Color.argb(38, // 15% opacity
                 Color.red(potColor), Color.green(potColor), Color.blue(potColor));
         previewBg.setColor(alphaColor);
-        previewBg.setStroke(3, potColor);
         viewPreviewBg.setBackground(previewBg);
     }
 
