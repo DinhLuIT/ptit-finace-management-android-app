@@ -56,11 +56,9 @@ public class TransactionsFragment extends Fragment {
             switch (position) {
                 case TAB_HISTORY:
                     tab.setText(R.string.tab_history);
-                    tab.setIcon(R.drawable.ic_history);
                     break;
                 case TAB_RECURRING:
                     tab.setText(R.string.tab_recurring);
-                    tab.setIcon(R.drawable.ic_recurring);
                     break;
             }
         }).attach();

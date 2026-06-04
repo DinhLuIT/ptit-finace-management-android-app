@@ -15,19 +15,20 @@
         android:textSize="@dimen/text_title"
         android:textStyle="bold" />
 
-    <!-- Tab Layout: Lịch sử | Định kỳ -->
+    <!-- Tab Layout: Lịch sử | Định kỳ (Segmented Control Style) -->
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/tab_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/spacing_md"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
         android:background="@drawable/bg_tab_container"
-        app:tabIndicatorColor="@color/color_primary"
-        app:tabIndicatorFullWidth="true"
-        app:tabIndicatorHeight="3dp"
+        app:tabBackground="@drawable/tab_selector"
+        app:tabIndicatorHeight="0dp"
         app:tabSelectedTextColor="@color/color_primary"
         app:tabTextColor="@color/color_text_secondary"
-        app:tabRippleColor="@color/color_primary"
+        app:tabRippleColor="@null"
         app:tabMode="fixed"
         app:tabGravity="fill" />
 

@@ -151,7 +151,7 @@ public class AddPotDialog extends DialogFragment {
                 if (iconKey.equals(selectedIcon) || selectedIcon.isEmpty()) {
                     tv.setTextColor(potColor);
                 } else {
-                    tv.setTextColor(Color.parseColor("#9E9E9E"));
+                    tv.setTextColor(requireContext().getResources().getColor(R.color.color_text_secondary));
                 }
                 iconContainer = tv;
             } else {
@@ -162,7 +162,7 @@ public class AddPotDialog extends DialogFragment {
                 if (iconKey.equals(selectedIcon)) {
                     iv.setColorFilter(potColor);
                 } else {
-                    iv.setColorFilter(Color.parseColor("#9E9E9E"));
+                    iv.setColorFilter(requireContext().getResources().getColor(R.color.color_text_secondary));
                 }
                 iconContainer = iv;
             }
@@ -181,7 +181,7 @@ public class AddPotDialog extends DialogFragment {
             if (iconKey.equals(selectedIcon) || (iconKey.equals("EMPTY") && selectedIcon.isEmpty())) {
                 bgDrawable.setColor(Color.argb(38, Color.red(potColor), Color.green(potColor), Color.blue(potColor)));
             } else {
-                bgDrawable.setColor(Color.parseColor("#F5F5F5"));
+                bgDrawable.setColor(requireContext().getResources().getColor(R.color.color_surface_variant));
             }
             iconContainer.setBackground(bgDrawable);
 
@@ -217,7 +217,7 @@ public class AddPotDialog extends DialogFragment {
             drawable.setColor(Color.parseColor(color));
 
             if (color.equals(selectedColor)) {
-                drawable.setStroke((int) (1.5f * density), Color.parseColor("#212121"));
+                drawable.setStroke((int) (1.5f * density), requireContext().getResources().getColor(R.color.color_text_primary));
             }
 
             colorView.setBackground(drawable);

@@ -24,6 +24,8 @@
 
     <!-- Search Box / Tab Background (dark variant) -->
     <color name="color_search_bg">#1A4CAF50</color>
+    <color name="color_tab_container">#1A1A1A</color>
+    <color name="color_tab_indicator">#2C2C2C</color>
 
     <!-- Progress Track (dark variant) -->
     <color name="color_progress_track">#1A4CAF50</color>

@@ -62,8 +62,16 @@ public class RecurringTransactionAdapter extends RecyclerView.Adapter<RecurringT
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         RecurringTransaction recurring = items.get(position);
 
-        // Icon danh mục (map key DB → emoji)
-        holder.tvCategoryIcon.setText(IconMapper.toEmoji(recurring.getCategoryIcon()));
+        // Icon danh mục (vector drawable)
+        holder.tvCategoryIcon.setImageResource(IconMapper.getIconResource(context, recurring.getCategoryIcon()));
+
+        // Màu nền icon dựa theo category
+        int colorIndex = Math.abs(recurring.getCategoryId()) % Constants.POT_COLORS.length;
+        int bgColor = android.graphics.Color.parseColor(Constants.POT_COLORS[colorIndex]);
+        android.graphics.drawable.GradientDrawable bgDrawable = new android.graphics.drawable.GradientDrawable();
+        bgDrawable.setShape(android.graphics.drawable.GradientDrawable.OVAL);
+        bgDrawable.setColor(bgColor);
+        holder.tvCategoryIcon.setBackground(bgDrawable);
 
         // Note hoặc tên danh mục
         String displayName = recurring.getNote() != null && !recurring.getNote().isEmpty()
@@ -125,7 +133,8 @@ public class RecurringTransactionAdapter extends RecyclerView.Adapter<RecurringT
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {
-        TextView tvCategoryIcon, tvNote, tvFrequency, tvPotName, tvNextDate, tvAmount;
+        ImageView tvCategoryIcon;
+        TextView tvNote, tvFrequency, tvPotName, tvNextDate, tvAmount;
 
         ViewHolder(@NonNull View itemView) {
             super(itemView);

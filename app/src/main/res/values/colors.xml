@@ -59,6 +59,8 @@
 
     <!-- Search Box / Tab Background -->
     <color name="color_search_bg">#E8F5E9</color>
+    <color name="color_tab_container">#F0F2F5</color>
+    <color name="color_tab_indicator">#FFFFFF</color>
 
     <!-- Progress Track -->
     <color name="color_progress_track">#E8F5E9</color>
