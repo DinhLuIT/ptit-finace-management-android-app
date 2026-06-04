@@ -16,6 +16,7 @@ import com.ptithcm.finacemanager.model.Transaction;
 import com.ptithcm.finacemanager.BuildConfig;
 import com.ptithcm.finacemanager.utils.Constants;
 import com.ptithcm.finacemanager.utils.DateUtils;
+import com.ptithcm.finacemanager.utils.DemoDataSeeder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -201,127 +202,7 @@ public class DBManager extends SQLiteOpenHelper {
 
     // Seed hũ tài chính và giao dịch mẫu phục vụ mục đích kiểm thử dự án
     private void seedPotsAndTransactions(SQLiteDatabase db) {
-        String nowTimestamp = DateUtils.getNowDB();
-        String todayDate = DateUtils.getTodayDB();
-
-        // 1. Thêm các hũ mẫu (Pots)
-        // Hũ Thiết Yếu (ID: 1)
-        ContentValues potNecessities = new ContentValues();
-        potNecessities.put("NAME", "Chi tiêu thiết yếu");
-        potNecessities.put("BALANCE", 5500000.0);
-        potNecessities.put("BUDGET_LIMIT", 10000000.0);
-        potNecessities.put("COLOR", "#4CAF50");
-        potNecessities.put("ICON", "🍜");
-        potNecessities.put("CREATED_AT", nowTimestamp);
-        potNecessities.put("IS_ACTIVE", 1);
-        long potNecessitiesId = db.insert(Constants.TABLE_POTS, null, potNecessities);
-
-        // Hũ Tiết Kiệm (ID: 2)
-        ContentValues potSavings = new ContentValues();
-        potSavings.put("NAME", "Tích lũy & Tiết kiệm");
-        potSavings.put("BALANCE", 3000000.0);
-        potSavings.put("BUDGET_LIMIT", 5000000.0);
-        potSavings.put("COLOR", "#2196F3");
-        potSavings.put("ICON", "💰");
-        potSavings.put("CREATED_AT", nowTimestamp);
-        potSavings.put("IS_ACTIVE", 1);
-        long potSavingsId = db.insert(Constants.TABLE_POTS, null, potSavings);
-
-        // Hũ Giáo Dục (ID: 3)
-        ContentValues potEducation = new ContentValues();
-        potEducation.put("NAME", "Học tập & Phát triển");
-        potEducation.put("BALANCE", 1500000.0);
-        potEducation.put("BUDGET_LIMIT", 3000000.0);
-        potEducation.put("COLOR", "#FF9800");
-        potEducation.put("ICON", "📚");
-        potEducation.put("CREATED_AT", nowTimestamp);
-        potEducation.put("IS_ACTIVE", 1);
-        long potEducationId = db.insert(Constants.TABLE_POTS, null, potEducation);
-
-        // Hũ Hưởng Thụ (ID: 4)
-        ContentValues potPlay = new ContentValues();
-        potPlay.put("NAME", "Giải trí & Hưởng thụ");
-        potPlay.put("BALANCE", 800000.0);
-        potPlay.put("BUDGET_LIMIT", 2000000.0);
-        potPlay.put("COLOR", "#9C27B0");
-        potPlay.put("ICON", "🎮");
-        potPlay.put("CREATED_AT", nowTimestamp);
-        potPlay.put("IS_ACTIVE", 1);
-        long potPlayId = db.insert(Constants.TABLE_POTS, null, potPlay);
-
-        // 2. Lấy ID danh mục mẫu để liên kết giao dịch
-        int categoryFoodId = getCategoryIdByNameInternal(db, "cat_food");
-        int categorySalaryId = getCategoryIdByNameInternal(db, "cat_salary");
-        int categoryEducationId = getCategoryIdByNameInternal(db, "cat_education");
-        int categoryEntertainmentId = getCategoryIdByNameInternal(db, "cat_entertainment");
-        int categoryTransferOutId = getCategoryIdByNameInternal(db, Constants.CAT_TRANSFER_OUT);
-        int categoryTransferInId = getCategoryIdByNameInternal(db, Constants.CAT_TRANSFER_IN);
-
-        // 3. Thêm giao dịch mẫu (Transactions)
-        // Giao dịch 1: Thu nhập lương vào hũ Thiết Yếu
-        ContentValues transSalary = new ContentValues();
-        transSalary.put("POT_ID", potNecessitiesId);
-        transSalary.put("CATEGORY_ID", categorySalaryId);
-        transSalary.put("AMOUNT", 8000000.0);
-        transSalary.put("TYPE", Constants.TYPE_INCOME);
-        transSalary.put("DATE", todayDate);
-        transSalary.put("NOTE", "Nhận lương tháng này");
-        transSalary.put("CREATED_AT", nowTimestamp);
-        db.insert(Constants.TABLE_TRANSACTIONS, null, transSalary);
-
-        // Giao dịch 2: Tiền ăn uống hàng ngày từ hũ Thiết Yếu
-        ContentValues transFood = new ContentValues();
-        transFood.put("POT_ID", potNecessitiesId);
-        transFood.put("CATEGORY_ID", categoryFoodId);
-        transFood.put("AMOUNT", 500000.0);
-        transFood.put("TYPE", Constants.TYPE_EXPENSE);
-        transFood.put("DATE", todayDate);
-        transFood.put("NOTE", "Đi chợ và mua sắm thực phẩm tuần");
-        transFood.put("CREATED_AT", nowTimestamp);
-        db.insert(Constants.TABLE_TRANSACTIONS, null, transFood);
-
-        // Giao dịch 3: Tiền học khóa học online từ hũ Giáo Dục
-        ContentValues transBook = new ContentValues();
-        transBook.put("POT_ID", potEducationId);
-        transBook.put("CATEGORY_ID", categoryEducationId);
-        transBook.put("AMOUNT", 500000.0);
-        transBook.put("TYPE", Constants.TYPE_EXPENSE);
-        transBook.put("DATE", todayDate);
-        transBook.put("NOTE", "Mua khóa học lập trình Android");
-        transBook.put("CREATED_AT", nowTimestamp);
-        db.insert(Constants.TABLE_TRANSACTIONS, null, transBook);
-
-        // Giao dịch 4: Mua game từ hũ Hưởng Thụ
-        ContentValues transGame = new ContentValues();
-        transGame.put("POT_ID", potPlayId);
-        transGame.put("CATEGORY_ID", categoryEntertainmentId);
-        transGame.put("AMOUNT", 200000.0);
-        transGame.put("TYPE", Constants.TYPE_EXPENSE);
-        transGame.put("DATE", todayDate);
-        transGame.put("NOTE", "Mua game giải trí cuối tuần");
-        transGame.put("CREATED_AT", nowTimestamp);
-        db.insert(Constants.TABLE_TRANSACTIONS, null, transGame);
-
-        // Giao dịch 5 & 6: Chuyển khoản mẫu (Chuyển 2.000.000đ từ Thiết yếu sang Tiết kiệm)
-        ContentValues transTransferOut = new ContentValues();
-        transTransferOut.put("POT_ID", potNecessitiesId);
-        transTransferOut.put("CATEGORY_ID", categoryTransferOutId);
-        transTransferOut.put("AMOUNT", 2000000.0);
-        transTransferOut.put("TYPE", Constants.TYPE_EXPENSE);
-        transTransferOut.put("DATE", todayDate);
-        transTransferOut.put("NOTE", "Trích tiền tiết kiệm hàng tháng");
-        transTransferOut.put("CREATED_AT", nowTimestamp);
-        db.insert(Constants.TABLE_TRANSACTIONS, null, transTransferOut);
-
-        ContentValues transTransferIn = new ContentValues();
-        transTransferIn.put("POT_ID", potSavingsId);
-        transTransferIn.put("CATEGORY_ID", categoryTransferInId);
-        transTransferIn.put("AMOUNT", 2000000.0);
-        transTransferIn.put("TYPE", Constants.TYPE_INCOME);
-        transTransferIn.put("DATE", todayDate);
-        transTransferIn.put("NOTE", "Trích tiền tiết kiệm hàng tháng");
-        transTransferIn.put("CREATED_AT", nowTimestamp);
-        db.insert(Constants.TABLE_TRANSACTIONS, null, transTransferIn);
+        DemoDataSeeder.seedDemoData(db);
     }
 
     // =============================================
