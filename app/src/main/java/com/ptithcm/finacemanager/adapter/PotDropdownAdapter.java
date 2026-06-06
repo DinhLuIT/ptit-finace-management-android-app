@@ -7,7 +7,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -16,7 +15,6 @@ import androidx.annotation.Nullable;
 import com.ptithcm.finacemanager.R;
 import com.ptithcm.finacemanager.model.Pot;
 import com.ptithcm.finacemanager.utils.CurrencyFormatter;
-import com.ptithcm.finacemanager.utils.IconMapper;
 
 import java.util.List;
 
@@ -49,7 +47,6 @@ public class PotDropdownAdapter extends ArrayAdapter<Pot> {
 
         Pot pot = getItem(position);
         if (pot != null) {
-            ImageView ivIcon = convertView.findViewById(R.id.iv_pot_icon);
             TextView tvName = convertView.findViewById(R.id.tv_pot_name);
             TextView tvBalance = convertView.findViewById(R.id.tv_pot_balance);
             View viewColor = convertView.findViewById(R.id.view_pot_color);
@@ -71,14 +68,6 @@ public class PotDropdownAdapter extends ArrayAdapter<Pot> {
                 } catch (Exception e) {
                     drawable.setColor(Color.parseColor("#4CAF50")); // default
                 }
-            }
-
-            // Set Icon
-            String iconKey = pot.getIcon();
-            if (iconKey != null && !iconKey.isEmpty() && !iconKey.equals("ic_default")) {
-                ivIcon.setImageResource(IconMapper.getIconResource(getContext(), iconKey));
-            } else {
-                ivIcon.setImageResource(R.drawable.ic_savings); // default pot icon
             }
         }
         return convertView;

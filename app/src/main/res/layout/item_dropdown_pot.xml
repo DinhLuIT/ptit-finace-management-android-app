@@ -8,18 +8,10 @@
 
     <View
         android:id="@+id/view_pot_color"
-        android:layout_width="12dp"
-        android:layout_height="12dp"
-        android:layout_marginEnd="8dp"
-        android:background="@drawable/bg_circle" />
-
-    <ImageView
-        android:id="@+id/iv_pot_icon"
-        android:layout_width="20dp"
-        android:layout_height="20dp"
+        android:layout_width="16dp"
+        android:layout_height="16dp"
         android:layout_marginEnd="12dp"
-        android:tint="@color/color_text_primary"
-        android:src="@drawable/ic_savings" />
+        android:background="@drawable/bg_circle" />
 
     <TextView
         android:id="@+id/tv_pot_name"
