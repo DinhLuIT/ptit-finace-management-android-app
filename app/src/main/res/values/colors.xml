@@ -11,6 +11,7 @@
     <color name="color_surface">#FFFFFF</color>
     <color name="color_surface_variant">#F0F2F5</color>
     <color name="color_card">#FFFFFF</color>
+    <color name="color_progress_track">#E0E0E0</color>
 
     <!-- Text -->
     <color name="color_text_primary">#212121</color>
@@ -63,5 +64,4 @@
     <color name="color_tab_indicator">#FFFFFF</color>
 
     <!-- Progress Track -->
-    <color name="color_progress_track">#E8F5E9</color>
 </resources>

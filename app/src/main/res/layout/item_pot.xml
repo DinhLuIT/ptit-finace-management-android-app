@@ -157,7 +157,7 @@
                 app:trackCornerRadius="4dp"
                 android:max="100"
                 tools:progress="52"
-                app:trackColor="#E0E0E0" />
+                app:trackColor="@color/color_progress_track" />
         </LinearLayout>
 
     </LinearLayout>

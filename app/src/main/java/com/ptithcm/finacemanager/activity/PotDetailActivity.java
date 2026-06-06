@@ -4,12 +4,17 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ProgressBar;
+
+import com.google.android.material.progressindicator.LinearProgressIndicator;
 import android.widget.TextView;
+import android.graphics.Color;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.material.card.MaterialCardView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.ptithcm.finacemanager.R;
@@ -32,8 +37,10 @@ import java.util.List;
  */
 public class PotDetailActivity extends AppCompatActivity {
 
-    private TextView textViewPotName, textViewBalance, textViewBudgetInfo, textViewEmpty;
-    private ProgressBar progressBarBudget;
+    private TextView textViewPotName, textViewBalance, textViewEmpty;
+    private TextView textViewPercentageBadge, textViewSpentAmount, textViewBudgetAmount;
+    private MaterialCardView cardPercentageBadge;
+    private LinearProgressIndicator progressBarBudget;
     private RecyclerView recyclerViewTransactions;
     private FloatingActionButton floatingActionButtonAddTransaction;
 
@@ -69,7 +76,10 @@ public class PotDetailActivity extends AppCompatActivity {
     private void initViews() {
         textViewPotName = findViewById(R.id.tv_pot_name);
         textViewBalance = findViewById(R.id.tv_balance);
-        textViewBudgetInfo = findViewById(R.id.tv_budget_info);
+        textViewPercentageBadge = findViewById(R.id.tv_percentage_badge);
+        textViewSpentAmount = findViewById(R.id.tv_spent_amount);
+        textViewBudgetAmount = findViewById(R.id.tv_budget_amount);
+        cardPercentageBadge = findViewById(R.id.cv_percentage_badge);
         textViewEmpty = findViewById(R.id.tv_empty);
         progressBarBudget = findViewById(R.id.pb_budget);
         recyclerViewTransactions = findViewById(R.id.rv_transactions);
@@ -142,11 +152,21 @@ public class PotDetailActivity extends AppCompatActivity {
         int percentage = pot.getBudgetPercentage();
         progressBarBudget.setProgress(percentage);
 
-        String budgetText = percentage + "% " +
-                getString(R.string.label_spent) + " · " +
-                getString(R.string.label_budget) + ": " +
-                CurrencyFormatter.format(pot.getBudgetLimit());
-        textViewBudgetInfo.setText(budgetText);
+        double spent = pot.getBudgetLimit() - pot.getBalance();
+        if (spent < 0) spent = 0;
+
+        textViewPercentageBadge.setText(percentage + "%");
+        textViewSpentAmount.setText(getString(R.string.label_spent) + ": " + CurrencyFormatter.format(spent));
+        textViewBudgetAmount.setText(getString(R.string.label_budget) + ": " + CurrencyFormatter.format(pot.getBudgetLimit()));
+
+        // Set color dynamically from Pot
+        try {
+            int potColor = Color.parseColor(pot.getColor());
+            progressBarBudget.setIndicatorColor(potColor);
+            cardPercentageBadge.setCardBackgroundColor(potColor);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         // Load transactions
         transactions = databaseManager.getTransactionsByPotId(potId);

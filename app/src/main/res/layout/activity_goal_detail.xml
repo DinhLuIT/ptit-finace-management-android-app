@@ -107,6 +107,15 @@
                             android:textSize="48sp"
                             android:textStyle="bold" />
 
+                        <!-- Còn thiếu (Chuyển lên đây) -->
+                        <TextView
+                            android:id="@+id/tv_remaining_amount"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:textColor="@color/color_text_on_primary_secondary"
+                            android:textSize="14sp" />
+
                         <!-- Progress Bar -->
                         <ProgressBar
                             android:id="@+id/pb_goal_progress"
@@ -170,7 +179,7 @@
                             </LinearLayout>
                         </LinearLayout>
 
-                        <!-- Còn thiếu + Ngày còn lại -->
+                        <!-- Ngày còn lại -->
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
@@ -178,14 +187,11 @@
                             android:gravity="center_vertical"
                             android:orientation="horizontal">
 
-                            <!-- TODO: Thêm string resource "Còn thiếu" -->
-                            <TextView
-                                android:id="@+id/tv_remaining_amount"
+                            <!-- Spacer đẩy phần ngày sang phải -->
+                            <View
                                 android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:textColor="@color/color_text_on_primary_secondary"
-                                android:textSize="@dimen/text_caption" />
+                                android:layout_height="0dp"
+                                android:layout_weight="1" />
 
                             <TextView
                                 android:layout_width="wrap_content"
