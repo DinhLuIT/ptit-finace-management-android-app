@@ -12,6 +12,11 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+import java.util.TimeZone;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -363,10 +368,33 @@ public class ExchangeRateActivity extends AppCompatActivity {
 
     private void updateLastUpdateText(String timeUtc) {
         if (timeUtc != null && !timeUtc.isEmpty()) {
-            tvLastUpdate.setText(getString(R.string.label_last_update, timeUtc));
+            String formatted = formatLocalizedDate(timeUtc);
+            tvLastUpdate.setText(getString(R.string.label_last_update, formatted));
             tvLastUpdate.setVisibility(View.VISIBLE);
         } else {
             tvLastUpdate.setVisibility(View.GONE);
+        }
+    }
+
+    /**
+     * Chuyển chuỗi thời gian UTC từ API (VD: "Sat, 06 Jun 2026 00:02:32 +0000")
+     * sang định dạng theo locale và múi giờ hiện tại của thiết bị.
+     */
+    private String formatLocalizedDate(String timeUtc) {
+        try {
+            // Parse chuỗi gốc (luôn tiếng Anh từ API)
+            SimpleDateFormat inputFormat = new SimpleDateFormat(
+                    "EEE, dd MMM yyyy HH:mm:ss Z", Locale.ENGLISH);
+            Date date = inputFormat.parse(timeUtc);
+
+            // Format lại theo locale + múi giờ hiện tại của thiết bị
+            SimpleDateFormat outputFormat = new SimpleDateFormat(
+                    "HH:mm dd/MM/yyyy", Locale.getDefault());
+            outputFormat.setTimeZone(TimeZone.getDefault());
+
+            return outputFormat.format(date);
+        } catch (Exception e) {
+            return timeUtc;
         }
     }
 
