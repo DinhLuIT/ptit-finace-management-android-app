@@ -149,46 +149,6 @@
                     android:layout_height="1dp"
                     android:background="@color/color_divider" />
 
-                <!-- Notification Budget Alert Toggle -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="@dimen/item_min_height"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal"
-                    android:paddingHorizontal="@dimen/spacing_md">
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/label_notification_budget"
-                            android:textColor="@color/color_text_primary"
-                            android:textSize="@dimen/text_subtitle" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/label_notification_budget_desc"
-                            android:textColor="@color/color_text_secondary"
-                            android:textSize="11sp" />
-                    </LinearLayout>
-
-                    <com.google.android.material.switchmaterial.SwitchMaterial
-                        android:id="@+id/switch_notification"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content" />
-                </LinearLayout>
-
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="@color/color_divider" />
-
                 <!-- Biometric Unlock Toggle -->
                 <LinearLayout
                     android:id="@+id/ll_biometric"

@@ -30,7 +30,6 @@ import com.ptithcm.finacemanager.utils.NotificationHelper;
 public class ProfileFragment extends Fragment {
 
     private SwitchMaterial switchDarkMode;
-    private SwitchMaterial switchNotification;
     private SwitchMaterial switchBiometric;
     private TextView tvBiometricDesc;
 
@@ -50,16 +49,12 @@ public class ProfileFragment extends Fragment {
 
     private void initViews(View view) {
         switchDarkMode = view.findViewById(R.id.switch_dark_mode);
-        switchNotification = view.findViewById(R.id.switch_notification);
         switchBiometric = view.findViewById(R.id.switch_biometric);
         tvBiometricDesc = view.findViewById(R.id.tv_biometric_desc);
 
         // Đặt trạng thái ban đầu cho dark mode
         int currentMode = AppCompatDelegate.getDefaultNightMode();
         switchDarkMode.setChecked(currentMode == AppCompatDelegate.MODE_NIGHT_YES);
-
-        // Đặt trạng thái ban đầu cho notification từ SharedPreferences
-        switchNotification.setChecked(NotificationHelper.isNotificationEnabled(requireContext()));
 
         // Thiết lập trạng thái ban đầu cho Biometric
         initBiometricSwitch();
@@ -77,11 +72,6 @@ public class ProfileFragment extends Fragment {
             } else {
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
             }
-        });
-
-        // Toggle Notification Budget Alert
-        switchNotification.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            NotificationHelper.setNotificationEnabled(requireContext(), isChecked);
         });
 
         // Mở màn hình Thống kê chi tiêu
