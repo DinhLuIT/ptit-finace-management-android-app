@@ -795,6 +795,21 @@ public class DBManager extends SQLiteOpenHelper {
     // =============================================
 
     /**
+     * Lấy danh sách giao dịch chi tiêu theo danh mục và tháng/năm cụ thể.
+     */
+    public List<Transaction> getTransactionsByCategoryAndMonth(int categoryId, int month, int year) {
+        String monthPattern = String.format("%04d-%02d", year, month) + "%";
+        return getTransactionsWithQuery(
+                "SELECT T.*, P.NAME AS POT_NAME, C.NAME AS CAT_NAME, C.ICON AS CAT_ICON " +
+                        "FROM " + Constants.TABLE_TRANSACTIONS + " T " +
+                        "LEFT JOIN " + Constants.TABLE_POTS + " P ON T.POT_ID = P.ID " +
+                        "LEFT JOIN " + Constants.TABLE_CATEGORIES + " C ON T.CATEGORY_ID = C.ID " +
+                        "WHERE T.CATEGORY_ID = ? AND T.DATE LIKE ? " +
+                        "ORDER BY T.DATE DESC, T.CREATED_AT DESC",
+                new String[]{String.valueOf(categoryId), monthPattern});
+    }
+
+    /**
      * Lấy tổng chi tiêu nhóm theo danh mục trong một tháng cụ thể.
      * Loại trừ các giao dịch chuyển tiền (cat_transfer_out) để thống kê đúng chi tiêu thực tế.
      *
@@ -887,6 +902,30 @@ public class DBManager extends SQLiteOpenHelper {
             database.close();
         }
         return latestDate;
+    }
+
+    /**
+     * Lấy danh sách các tháng/năm có giao dịch (không trùng lặp).
+     * Trả về List<String> dạng "yyyy-MM", sắp xếp giảm dần (mới nhất trước).
+     */
+    public List<String> getDistinctTransactionMonths() {
+        List<String> months = new ArrayList<>();
+        SQLiteDatabase database = getReadableDatabase();
+        Cursor cursor = database.rawQuery(
+                "SELECT DISTINCT SUBSTR(DATE, 1, 7) AS MONTH_YEAR " +
+                        "FROM " + Constants.TABLE_TRANSACTIONS +
+                        " ORDER BY MONTH_YEAR DESC", null);
+        try {
+            if (cursor.moveToFirst()) {
+                do {
+                    months.add(cursor.getString(0));
+                } while (cursor.moveToNext());
+            }
+        } finally {
+            cursor.close();
+            database.close();
+        }
+        return months;
     }
 
     // =============================================

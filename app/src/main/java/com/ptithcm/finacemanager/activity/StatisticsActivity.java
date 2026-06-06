@@ -1,5 +1,7 @@
 package com.ptithcm.finacemanager.activity;
 
+import android.app.AlertDialog;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -141,6 +143,48 @@ public class StatisticsActivity extends AppCompatActivity {
             }
             loadData();
         });
+
+        // Nhấn vào tháng → mở DatePicker chọn tháng/năm
+        textViewCurrentMonth.setOnClickListener(view -> showMonthYearPicker());
+    }
+
+    /**
+     * Hiển thị dialog chọn tháng. Chỉ hiện các tháng thực sự có giao dịch.
+     */
+    private void showMonthYearPicker() {
+        List<String> availableMonths = databaseManager.getDistinctTransactionMonths();
+
+        if (availableMonths.isEmpty()) {
+            return;
+        }
+
+        // Chuyển "yyyy-MM" thành label hiển thị "Tháng MM/yyyy"
+        String[] displayLabels = new String[availableMonths.size()];
+        int checkedIndex = 0;
+        String currentKey = String.format(Locale.getDefault(), "%04d-%02d", currentYear, currentMonth);
+
+        for (int i = 0; i < availableMonths.size(); i++) {
+            String ym = availableMonths.get(i); // "2026-06"
+            String[] parts = ym.split("-");
+            displayLabels[i] = String.format("Tháng %s/%s", parts[1], parts[0]);
+
+            if (ym.equals(currentKey)) {
+                checkedIndex = i;
+            }
+        }
+
+        new AlertDialog.Builder(this)
+                .setTitle("Chọn tháng")
+                .setSingleChoiceItems(displayLabels, checkedIndex, (dialog, which) -> {
+                    String selected = availableMonths.get(which);
+                    String[] parts = selected.split("-");
+                    currentYear = Integer.parseInt(parts[0]);
+                    currentMonth = Integer.parseInt(parts[1]);
+                    loadData();
+                    dialog.dismiss();
+                })
+                .setNegativeButton("Hủy", null)
+                .show();
     }
 
     /**
@@ -170,6 +214,9 @@ public class StatisticsActivity extends AppCompatActivity {
 
         // Sử dụng phần trăm
         pieChartExpense.setUsePercentValues(true);
+
+        // TẮT chữ (tên danh mục) hiển thị trên các slice của đồ thị
+        pieChartExpense.setDrawEntryLabels(false);
 
         // Khoảng đệm
         pieChartExpense.setExtraOffsets(8f, 8f, 8f, 8f);
@@ -307,6 +354,15 @@ public class StatisticsActivity extends AppCompatActivity {
         if (categoryExpenseAdapter == null) {
             categoryExpenseAdapter = new CategoryExpenseAdapter(
                     categoryExpenseList, this, CHART_COLORS);
+            categoryExpenseAdapter.setOnCategoryClickListener(categoryExpense -> {
+                Intent intent = new Intent(this, CategoryTransactionsActivity.class);
+                intent.putExtra("EXTRA_CATEGORY_ID", categoryExpense.getCategoryId());
+                intent.putExtra("EXTRA_CATEGORY_NAME", categoryExpense.getCategoryName());
+                intent.putExtra("EXTRA_MONTH", currentMonth);
+                intent.putExtra("EXTRA_YEAR", currentYear);
+                startActivity(intent);
+                overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+            });
             recyclerViewCategoryExpenses.setAdapter(categoryExpenseAdapter);
         } else {
             categoryExpenseAdapter.updateData(categoryExpenseList);

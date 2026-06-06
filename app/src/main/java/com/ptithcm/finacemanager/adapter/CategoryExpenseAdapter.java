@@ -30,8 +30,15 @@ public class CategoryExpenseAdapter
     private List<CategoryExpense> categoryExpenseList;
     private final Context context;
     private final int[] chartColors;
+    private OnCategoryClickListener onCategoryClickListener;
 
-    // Không cần dùng ICON_MAP nữa vì đã dùng VectorDrawable chung qua IconMapper
+    public interface OnCategoryClickListener {
+        void onCategoryClick(CategoryExpense categoryExpense);
+    }
+
+    public void setOnCategoryClickListener(OnCategoryClickListener listener) {
+        this.onCategoryClickListener = listener;
+    }
 
     public CategoryExpenseAdapter(List<CategoryExpense> categoryExpenseList,
                                   Context context, int[] chartColors) {
@@ -78,6 +85,13 @@ public class CategoryExpenseAdapter
         // Số tiền (hiển thị giá trị tuyệt đối, không có dấu +/-)
         holder.textViewCategoryAmount.setText(
                 CurrencyFormatter.format(categoryExpense.getTotalAmount()));
+
+        // Click vào item → xem lịch sử giao dịch
+        holder.itemView.setOnClickListener(v -> {
+            if (onCategoryClickListener != null) {
+                onCategoryClickListener.onCategoryClick(categoryExpense);
+            }
+        });
     }
 
     @Override

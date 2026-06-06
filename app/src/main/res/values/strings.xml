@@ -149,6 +149,7 @@
     <string name="label_previous_month">Tháng trước</string>
     <string name="label_next_month">Tháng sau</string>
     <string name="format_month_year" formatted="false">Tháng %02d/%d</string>
+    <string name="empty_category_transactions">Không có giao dịch nào trong\ndanh mục này 📋</string>
 
     <!-- Notification Channel -->
     <string name="notification_channel_budget">Cảnh báo ngân sách</string>

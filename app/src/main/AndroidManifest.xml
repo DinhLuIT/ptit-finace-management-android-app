@@ -51,6 +51,11 @@
             android:name=".activity.StatisticsActivity"
             android:exported="false" />
 
+        <!-- Category Transactions -->
+        <activity
+            android:name=".activity.CategoryTransactionsActivity"
+            android:exported="false" />
+
         <!-- Savings Goals List -->
         <activity
             android:name=".activity.SavingsGoalsActivity"
