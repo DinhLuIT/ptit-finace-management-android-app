@@ -141,11 +141,17 @@
     <string name="label_empty_state">Nothing here yet</string>
 
     <!-- Statistics -->
-    <string name="title_statistics">Expense Statistics</string>
+    <string name="title_statistics">Statistics</string>
     <string name="label_expense_breakdown">Expense Breakdown</string>
     <string name="label_detail_by_category">Details by Category</string>
     <string name="label_total_expense">Total Expense</string>
     <string name="label_no_expense_data">No expense data\nfor this month</string>
+    <string name="title_statistics_general">Statistics</string>
+    <string name="label_tab_expense">Expenses</string>
+    <string name="label_tab_income">Income</string>
+    <string name="label_income_breakdown">Income breakdown</string>
+    <string name="label_total_income">Total income</string>
+    <string name="label_no_income_data">No income data\nfor this month</string>
     <string name="label_previous_month">Previous month</string>
     <string name="label_next_month">Next month</string>
     <string name="format_month_year" formatted="false">Month %02d/%d</string>

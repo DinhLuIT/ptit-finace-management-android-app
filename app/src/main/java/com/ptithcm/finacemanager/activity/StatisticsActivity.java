@@ -27,6 +27,7 @@ import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
 import com.github.mikephil.charting.formatter.PercentFormatter;
 import com.google.android.material.appbar.MaterialToolbar;
+import com.google.android.material.button.MaterialButtonToggleGroup;
 import com.ptithcm.finacemanager.R;
 import com.ptithcm.finacemanager.adapter.CategoryExpenseAdapter;
 import com.ptithcm.finacemanager.database.DBManager;
@@ -48,16 +49,20 @@ public class StatisticsActivity extends AppCompatActivity {
     private PieChart pieChartExpense;
     private RecyclerView recyclerViewCategoryExpenses;
     private TextView textViewCurrentMonth;
+    private TextView textViewChartTitle;
     private ImageButton buttonPreviousMonth;
     private ImageButton buttonNextMonth;
     private LinearLayout layoutEmptyState;
     private View cardCategoryList;
+    private View cardPieChart;
+    private MaterialButtonToggleGroup toggleType;
 
     private DBManager databaseManager;
     private CategoryExpenseAdapter categoryExpenseAdapter;
 
     private int currentMonth;
     private int currentYear;
+    private boolean isViewingExpense = true;
 
     // Phạm vi tháng/năm có giao dịch (dùng để disable nút chuyển tháng)
     private int earliestMonth;
@@ -107,10 +112,13 @@ public class StatisticsActivity extends AppCompatActivity {
         pieChartExpense = findViewById(R.id.pie_chart_expense);
         recyclerViewCategoryExpenses = findViewById(R.id.rv_category_expenses);
         textViewCurrentMonth = findViewById(R.id.tv_current_month);
+        textViewChartTitle = findViewById(R.id.tv_chart_title);
         buttonPreviousMonth = findViewById(R.id.btn_previous_month);
         buttonNextMonth = findViewById(R.id.btn_next_month);
         layoutEmptyState = findViewById(R.id.layout_empty_state);
         cardCategoryList = findViewById(R.id.card_category_list);
+        cardPieChart = findViewById(R.id.card_pie_chart);
+        toggleType = findViewById(R.id.toggle_type);
 
         // Cấu hình RecyclerView
         recyclerViewCategoryExpenses.setLayoutManager(new LinearLayoutManager(this));
@@ -146,6 +154,16 @@ public class StatisticsActivity extends AppCompatActivity {
 
         // Nhấn vào tháng → mở DatePicker chọn tháng/năm
         textViewCurrentMonth.setOnClickListener(view -> showMonthYearPicker());
+
+        // Toggle Chi tiêu / Thu nhập
+        toggleType.addOnButtonCheckedListener((group, checkedId, isChecked) -> {
+            if (isChecked) {
+                isViewingExpense = (checkedId == R.id.btn_expense);
+                // Reset adapter để tạo mới với click listener phù hợp
+                categoryExpenseAdapter = null;
+                loadData();
+            }
+        });
     }
 
     /**
@@ -223,7 +241,7 @@ public class StatisticsActivity extends AppCompatActivity {
     }
 
     /**
-     * Tải dữ liệu chi tiêu theo tháng/năm hiện tại và cập nhật giao diện.
+     * Tải dữ liệu theo tháng/năm hiện tại và tab đang chọn, cập nhật giao diện.
      */
     private void loadData() {
         // Cập nhật tiêu đề tháng (VD: "Tháng 05/2026")
@@ -231,24 +249,30 @@ public class StatisticsActivity extends AppCompatActivity {
                 getString(R.string.format_month_year), currentMonth, currentYear);
         textViewCurrentMonth.setText(monthLabel);
 
-        // Truy vấn dữ liệu chi tiêu theo danh mục từ DB
-        List<CategoryExpense> categoryExpenseList =
-                databaseManager.getExpensesByCategory(currentMonth, currentYear);
+        // Truy vấn dữ liệu theo tab đang chọn
+        List<CategoryExpense> categoryList;
+        if (isViewingExpense) {
+            categoryList = databaseManager.getExpensesByCategory(currentMonth, currentYear);
+            textViewChartTitle.setText(R.string.label_expense_breakdown);
+        } else {
+            categoryList = databaseManager.getIncomeByCategory(currentMonth, currentYear);
+            textViewChartTitle.setText(R.string.label_income_breakdown);
+        }
 
-        if (categoryExpenseList.isEmpty()) {
+        if (categoryList.isEmpty()) {
             // Hiển thị trạng thái trống
-            pieChartExpense.setVisibility(View.GONE);
+            cardPieChart.setVisibility(View.GONE);
             cardCategoryList.setVisibility(View.GONE);
             layoutEmptyState.setVisibility(View.VISIBLE);
             pieChartExpense.clear();
         } else {
             // Hiển thị biểu đồ và danh sách
-            pieChartExpense.setVisibility(View.VISIBLE);
+            cardPieChart.setVisibility(View.VISIBLE);
             cardCategoryList.setVisibility(View.VISIBLE);
             layoutEmptyState.setVisibility(View.GONE);
 
-            updatePieChart(categoryExpenseList);
-            updateCategoryList(categoryExpenseList);
+            updatePieChart(categoryList);
+            updateCategoryList(categoryList);
         }
 
         // Cập nhật trạng thái enable/disable của nút chuyển tháng
@@ -281,7 +305,8 @@ public class StatisticsActivity extends AppCompatActivity {
         }
 
         PieDataSet pieDataSet = new PieDataSet(pieEntries,
-                getString(R.string.label_expense_breakdown));
+                isViewingExpense ? getString(R.string.label_expense_breakdown)
+                        : getString(R.string.label_income_breakdown));
 
         // Gán bảng màu
         pieDataSet.setColors(colorList);
@@ -306,8 +331,8 @@ public class StatisticsActivity extends AppCompatActivity {
 
         pieChartExpense.setData(pieData);
 
-        // Hiển thị tổng chi tiêu ở giữa lỗ Donut
-        SpannableString centerText = createCenterText(totalExpense);
+        // Hiển thị tổng ở giữa lỗ Donut
+        SpannableString centerText = createCenterText(totalExpense, isViewingExpense);
         pieChartExpense.setCenterText(centerText);
         pieChartExpense.setCenterTextSize(14f);
 
@@ -318,12 +343,14 @@ public class StatisticsActivity extends AppCompatActivity {
 
     /**
      * Tạo văn bản hiển thị ở chính giữa lỗ Donut.
-     * Dòng 1: "Tổng chi" (nhỏ, màu xám)
-     * Dòng 2: "x,xxx,xxx ₫" (lớn, đậm, màu đỏ)
+     * Dòng 1: "Tổng chi" hoặc "Tổng thu" (nhỏ, màu xám)
+     * Dòng 2: "x,xxx,xxx ₫" (lớn, đậm, màu đỏ hoặc xanh)
      */
-    private SpannableString createCenterText(double totalExpense) {
-        String totalLabel = getString(R.string.label_total_expense);
-        String totalFormatted = CurrencyFormatter.format(totalExpense);
+    private SpannableString createCenterText(double total, boolean isExpense) {
+        String totalLabel = isExpense
+                ? getString(R.string.label_total_expense)
+                : getString(R.string.label_total_income);
+        String totalFormatted = CurrencyFormatter.format(total);
         String fullText = totalLabel + "\n" + totalFormatted;
 
         SpannableString spannableString = new SpannableString(fullText);
@@ -336,12 +363,14 @@ public class StatisticsActivity extends AppCompatActivity {
                         ContextCompat.getColor(this, R.color.color_text_secondary)),
                 0, labelEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
 
-        // Dòng 2 (số tiền): đậm, màu đỏ
+        // Dòng 2 (số tiền): đậm, màu đỏ (chi) hoặc xanh (thu)
         int amountStart = labelEnd + 1;
+        int amountColor = isExpense
+                ? ContextCompat.getColor(this, R.color.color_expense)
+                : ContextCompat.getColor(this, R.color.color_income);
         spannableString.setSpan(new StyleSpan(Typeface.BOLD),
                 amountStart, fullText.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-        spannableString.setSpan(new ForegroundColorSpan(
-                        ContextCompat.getColor(this, R.color.color_expense)),
+        spannableString.setSpan(new ForegroundColorSpan(amountColor),
                 amountStart, fullText.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
 
         return spannableString;

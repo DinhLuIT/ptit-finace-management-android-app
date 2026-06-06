@@ -84,8 +84,45 @@
 
             </com.google.android.material.card.MaterialCardView>
 
+            <!-- Toggle Chi tiêu / Thu nhập -->
+            <com.google.android.material.button.MaterialButtonToggleGroup
+                android:id="@+id/toggle_type"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_sm"
+                app:singleSelection="true"
+                app:selectionRequired="true"
+                app:checkedButton="@id/btn_expense">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_expense"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    android:layout_weight="1"
+                    android:text="@string/label_tab_expense"
+                    android:textAllCaps="false"
+                    android:textSize="14sp"
+                    app:cornerRadius="12dp"
+                    app:strokeColor="@color/color_primary" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_income"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    android:layout_weight="1"
+                    android:text="@string/label_tab_income"
+                    android:textAllCaps="false"
+                    android:textSize="14sp"
+                    app:cornerRadius="12dp"
+                    app:strokeColor="@color/color_primary" />
+
+            </com.google.android.material.button.MaterialButtonToggleGroup>
+
             <!-- Biểu đồ tròn (PieChart) -->
             <com.google.android.material.card.MaterialCardView
+                android:id="@+id/card_pie_chart"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/spacing_sm"
@@ -101,6 +138,7 @@
                     android:padding="@dimen/spacing_md">
 
                     <TextView
+                        android:id="@+id/tv_chart_title"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/label_expense_breakdown"

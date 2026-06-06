@@ -865,6 +865,53 @@ public class DBManager extends SQLiteOpenHelper {
     }
 
     /**
+     * Lấy danh sách thu nhập theo danh mục trong tháng/năm cụ thể.
+     */
+    public List<CategoryExpense> getIncomeByCategory(int month, int year) {
+        List<CategoryExpense> categoryIncomeList = new ArrayList<>();
+        SQLiteDatabase database = getReadableDatabase();
+
+        String monthPattern = String.format("%04d-%02d", year, month) + "%";
+
+        String query = "SELECT C.ID, C.NAME, C.ICON, SUM(T.AMOUNT) AS TOTAL " +
+                "FROM " + Constants.TABLE_TRANSACTIONS + " T " +
+                "INNER JOIN " + Constants.TABLE_CATEGORIES + " C ON T.CATEGORY_ID = C.ID " +
+                "WHERE T.TYPE = ? AND T.DATE LIKE ? AND C.NAME != ? " +
+                "GROUP BY C.ID, C.NAME, C.ICON " +
+                "ORDER BY TOTAL DESC";
+
+        Cursor cursor = database.rawQuery(query,
+                new String[]{Constants.TYPE_INCOME, monthPattern, Constants.CAT_TRANSFER_IN});
+
+        double totalIncome = 0;
+        try {
+            if (cursor.moveToFirst()) {
+                do {
+                    CategoryExpense categoryExpense = new CategoryExpense();
+                    categoryExpense.setCategoryId(cursor.getInt(0));
+                    categoryExpense.setCategoryName(cursor.getString(1));
+                    categoryExpense.setCategoryIcon(cursor.getString(2));
+                    categoryExpense.setTotalAmount(cursor.getDouble(3));
+                    categoryIncomeList.add(categoryExpense);
+                    totalIncome += cursor.getDouble(3);
+                } while (cursor.moveToNext());
+            }
+        } finally {
+            cursor.close();
+            database.close();
+        }
+
+        if (totalIncome > 0) {
+            for (CategoryExpense categoryExpense : categoryIncomeList) {
+                float percentage = (float) ((categoryExpense.getTotalAmount() / totalIncome) * 100);
+                categoryExpense.setPercentage(percentage);
+            }
+        }
+
+        return categoryIncomeList;
+    }
+
+    /**
      * Lấy ngày giao dịch sớm nhất trong toàn bộ cơ sở dữ liệu.
      * Trả về null nếu chưa có giao dịch nào.
      */
